@@ -14,6 +14,11 @@ export const metadata: Metadata = {
   },
   description:
     'Premium media, web design, and digital strategy for brands that want to look sharper and move faster.',
+  metadataBase: new URL('https://www.unrvldgroup.com'),
+  openGraph: {
+    siteName: 'UNRVLD',
+    url: 'https://www.unrvldgroup.com',
+  },
   icons: {
     icon: [
       { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
