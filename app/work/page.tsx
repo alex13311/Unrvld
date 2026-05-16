@@ -9,6 +9,16 @@ export const metadata: Metadata = {
 
 const videographySections = [
   {
+    title: 'Mercedes Benz USA Shoot',
+    tagline: 'Cinematic automotive content for one of the most iconic brands in the world.',
+    landscape: true,
+    videos: [
+      { mobileSrc: '/g550 9.mp4', desktopSrc: '/g550 9.mp4' },
+      null,
+      null,
+    ],
+  },
+  {
     title: 'Premium Automotive',
     tagline: 'Cinematic car content engineered to generate leads and stop the scroll.',
     videos: [
