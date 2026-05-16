@@ -4,33 +4,31 @@ import HeroVideo from '@/components/hero-video'
 const capabilities = [
   'Videography',
   'Photography',
-  'Web Design',
-  'AI Tools',
-  'Media Strategy',
-  'Creative Direction',
+  'Social Media Management',
+  'Brand Strategy',
 ]
 
 const services = [
   {
     number: '01',
-    title: 'Media',
+    title: 'Videography',
     cta: 'View Work',
     href: '/work',
-    body: 'Cinematic visuals, social-first reels, and premium content built to make brands look expensive.',
+    body: 'Cinematic visuals and reels built to make your brand look premium.',
   },
   {
     number: '02',
-    title: 'Web',
-    cta: 'See Services',
+    title: 'Photography',
+    cta: 'View Work',
     href: '/work',
-    body: 'Modern websites designed to position your brand properly and convert attention into inquiries.',
+    body: 'High-end photo content that elevates your brand at every touchpoint.',
   },
   {
     number: '03',
-    title: 'Strategy',
+    title: 'Social Media & Strategy',
     cta: 'Learn More',
     href: '/about',
-    body: 'AI workflows, creative systems, and digital positioning that help brands move faster and operate sharper.',
+    body: 'Content management and brand strategy that keeps you consistent and sharp.',
   },
 ]
 

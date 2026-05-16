@@ -12,54 +12,37 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
   const mobileRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    const tryPlay = (video: HTMLVideoElement | null) => {
-      if (!video) return
-      video.muted = true
-      video.play().catch(() => {
-        // Retry once on interaction
-        const handler = () => {
-          video.play().catch(() => {})
-          document.removeEventListener('touchstart', handler)
-          document.removeEventListener('click', handler)
-        }
-        document.addEventListener('touchstart', handler, { once: true })
-        document.addEventListener('click', handler, { once: true })
-      })
-    }
-
-    tryPlay(desktopRef.current)
-    tryPlay(mobileRef.current)
+    ;[desktopRef.current, mobileRef.current].forEach((v) => {
+      if (!v) return
+      v.muted = true
+      v.play().catch(() => {})
+    })
   }, [])
 
   return (
     <>
-      {/* Desktop (landscape) */}
       <video
         ref={desktopRef}
+        src={desktopSrc}
         autoPlay
         muted
         loop
         playsInline
         preload="auto"
+        style={{ pointerEvents: 'none' }}
         className="absolute inset-0 hidden h-full w-full object-cover md:block"
-      >
-        <source src={desktopSrc} type="video/mp4" />
-        <source src={desktopSrc} type="video/quicktime" />
-      </video>
-
-      {/* Mobile (vertical) */}
+      />
       <video
         ref={mobileRef}
+        src={mobileSrc}
         autoPlay
         muted
         loop
         playsInline
         preload="auto"
+        style={{ pointerEvents: 'none' }}
         className="absolute inset-0 block h-full w-full object-cover md:hidden"
-      >
-        <source src={mobileSrc} type="video/mp4" />
-        <source src={mobileSrc} type="video/quicktime" />
-      </video>
+      />
     </>
   )
 }
