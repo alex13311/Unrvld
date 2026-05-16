@@ -33,9 +33,9 @@ const services = [
 ]
 
 const featured = [
-  { title: 'Luxury Automotive Campaign', category: 'Cinematic Reel' },
-  { title: 'Premium Brand Website', category: 'Web Design' },
-  { title: 'Founder Personal Brand Launch', category: 'Media Strategy' },
+  { title: 'Diablo x UNRVLD', category: 'Automotive Videography' },
+  { title: 'Founder Personal Brand Launch', category: 'Personal Branding' },
+  { title: 'Premium Brand Campaign', category: 'Commercial Film' },
   { title: 'High-End Product Shoot', category: 'Photography' },
 ]
 
