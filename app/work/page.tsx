@@ -9,16 +9,6 @@ export const metadata: Metadata = {
 
 const videographySections = [
   {
-    title: 'Mercedes Benz USA Shoot',
-    tagline: 'Cinematic automotive content for one of the most iconic brands in the world.',
-    landscape: true,
-    videos: [
-      { mobileSrc: '/g550 9.mp4', desktopSrc: '/g550 9.mp4' },
-      { mobileSrc: '/g550 8.mp4', desktopSrc: '/g550 8.mp4' },
-      null,
-    ],
-  },
-  {
     title: 'Premium Automotive',
     tagline: 'Cinematic car content engineered to generate leads and stop the scroll.',
     videos: [
@@ -35,6 +25,16 @@ const videographySections = [
       { mobileSrc: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4', desktopSrc: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4' },
       null,
       null,
+    ],
+  },
+  {
+    title: 'Mercedes Benz USA Shoot',
+    tagline: 'Cinematic automotive content for one of the most iconic brands in the world.',
+    landscape: true,
+    videos: [
+      { mobileSrc: '/g550 9.mp4', desktopSrc: '/g550 9.mp4' },
+      { mobileSrc: '/g550 8.mp4', desktopSrc: '/g550 8.mp4' },
+      { mobileSrc: '/g550 4.mp4', desktopSrc: '/g550 4.mp4' },
     ],
   },
 ]
