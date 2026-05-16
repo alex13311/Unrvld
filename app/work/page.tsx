@@ -16,16 +16,6 @@ const videographySections = [
       { mobileSrc: '/iceman 2 (1).mp4', desktopSrc: null },
     ],
   },
-  {
-    title: 'Personal Branding',
-    tagline: 'High-impact content that positions you as the authority in your space.',
-    videos: [null, null, null],
-  },
-  {
-    title: 'Brand & Commercial Films',
-    tagline: 'Story-driven visuals built to make your brand unforgettable.',
-    videos: [null, null, null],
-  },
 ]
 
 export default function WorkPage() {
@@ -126,8 +116,8 @@ export default function WorkPage() {
             High-end imagery that makes your brand impossible to ignore.
           </p>
 
-          <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
-            {Array.from({ length: 6 }).map((_, i) => (
+          <div className="columns-1 gap-5 sm:columns-2 lg:columns-2">
+            {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
                 className={`mb-5 flex break-inside-avoid items-center justify-center overflow-hidden rounded-2xl border border-dashed border-white/10 bg-white/[0.01] ${
