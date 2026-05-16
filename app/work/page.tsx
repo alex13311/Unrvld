@@ -20,6 +20,7 @@ const videographySections = [
   {
     title: 'Premium Brand Campaign',
     tagline: 'Story-driven visuals built to make your brand unforgettable.',
+    landscape: true,
     videos: [
       { mobileSrc: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4', desktopSrc: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4' },
       null,
@@ -77,7 +78,7 @@ export default function WorkPage() {
                       <div key={i} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
                         {/* Mobile */}
                         {video.mobileSrc ? (
-                          <div className="relative aspect-[9/16] w-full overflow-hidden md:hidden">
+                          <div className={`relative w-full overflow-hidden md:hidden ${section.landscape ? 'aspect-video' : 'aspect-[9/16]'}`}>
                             <video
                               src={video.mobileSrc}
                               autoPlay muted loop playsInline preload="auto"
@@ -86,7 +87,7 @@ export default function WorkPage() {
                             />
                           </div>
                         ) : (
-                          <div className="flex aspect-[9/16] items-center justify-center md:hidden">
+                          <div className={`flex items-center justify-center md:hidden ${section.landscape ? 'aspect-video' : 'aspect-[9/16]'}`}>
                             <p className="text-xs uppercase tracking-[0.25em] text-white/20">Coming Soon</p>
                           </div>
                         )}
