@@ -36,7 +36,7 @@ const services = [
 const featured = [
   { title: 'Diablo x UNRVLD', category: 'Automotive Videography', image: null, video: null },
   { title: 'Founder Personal Brand Launch', category: 'Personal Branding', image: null, video: null },
-  { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null, video: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov' },
+  { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null, video: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4' },
   { title: 'High-End Product Shoot', category: 'Photography', image: { src: '/IMG_7778.webp', width: 1800, height: 1200 }, video: null },
 ]
 
@@ -48,7 +48,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative flex min-h-[90vh] items-end overflow-hidden">
         <HeroVideo
-          desktopSrc="/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov"
+          desktopSrc="/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4"
           mobileSrc="/UNRVLD BACKROUND (1).mp4"
         />
         {/* Overlay */}
