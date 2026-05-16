@@ -12,7 +12,7 @@ const videographySections = [
     tagline: 'Cinematic car content engineered to generate leads and stop the scroll.',
     videos: [
       { mobileSrc: '/Diablo UNRVLD (1).mp4', desktopSrc: null },
-      { mobileSrc: '/copy_198A9F6B-1AE5-4ECF-81BE-38850451BF73 (1).mov', desktopSrc: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov' },
+      { mobileSrc: '/copy_198A9F6B-1AE5-4ECF-81BE-38850451BF73 (1).mov', desktopSrc: null },
       null,
     ],
   },
