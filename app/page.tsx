@@ -47,7 +47,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative flex min-h-[90vh] items-end overflow-hidden">
         <HeroVideo
-          desktopSrc="/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov"
+          desktopSrc="/copy_88BA4376-9531-4C22-B01D-7521382366F6.mov"
           mobileSrc="/copy_BDDBCF41-EAC7-4BCF-BE32-ABBC0753A4D5 2 (1).mov"
         />
         {/* Overlay */}
