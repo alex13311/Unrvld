@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
@@ -16,6 +17,14 @@ const videographySections = [
       { mobileSrc: '/iceman 2 (1).mp4', desktopSrc: null },
     ],
   },
+]
+
+const photos = [
+  { src: '/IMG_7774.jpeg', width: 1206, height: 1592 },
+  { src: '/IMG_7778.webp', width: 1800, height: 1200 },
+  { src: '/IMG_7775.jpeg', width: 1187, height: 1584 },
+  { src: '/IMG_7777.webp', width: 1800, height: 1012 },
+  { src: '/IMG_7776.jpeg', width: 1186, height: 1596 },
 ]
 
 export default function WorkPage() {
@@ -116,17 +125,16 @@ export default function WorkPage() {
             High-end imagery that makes your brand impossible to ignore.
           </p>
 
-          <div className="columns-1 gap-5 sm:columns-2 lg:columns-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className={`mb-5 flex break-inside-avoid items-center justify-center overflow-hidden rounded-2xl border border-dashed border-white/10 bg-white/[0.01] ${
-                  i % 3 === 1 ? 'aspect-[3/4]' : 'aspect-[4/3]'
-                }`}
-              >
-                <p className="text-xs uppercase tracking-[0.25em] text-white/20">
-                  Coming Soon
-                </p>
+          <div className="columns-1 gap-5 sm:columns-2">
+            {photos.map((photo) => (
+              <div key={photo.src} className="mb-5 break-inside-avoid overflow-hidden rounded-2xl">
+                <Image
+                  src={photo.src}
+                  alt="UNRVLD Photography"
+                  width={photo.width}
+                  height={photo.height}
+                  className="w-full h-auto"
+                />
               </div>
             ))}
           </div>
