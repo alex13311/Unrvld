@@ -13,7 +13,7 @@ const videographySections = [
     videos: [
       { mobileSrc: '/Diablo UNRVLD (1).mp4', desktopSrc: null },
       { mobileSrc: '/copy_198A9F6B-1AE5-4ECF-81BE-38850451BF73 (1).mov', desktopSrc: null },
-      null,
+      { mobileSrc: '/iceman 2 (1).mp4', desktopSrc: null },
     ],
   },
   {
