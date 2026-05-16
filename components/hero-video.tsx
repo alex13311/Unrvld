@@ -25,12 +25,18 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
         video.play().then(() => setPlaying(true)).catch(() => {})
       }
 
+      // Force the browser to start loading immediately (don't wait for scroll)
+      video.load()
+
+      video.addEventListener('loadedmetadata', tryPlay, { once: true })
       video.addEventListener('canplay', tryPlay, { once: true })
       video.addEventListener('playing', () => setPlaying(true))
+
+      // Try right away too
       tryPlay()
 
-      // Unlock on first interaction
-      const onInteract = () => { tryPlay() }
+      // Fallback on first interaction
+      const onInteract = () => tryPlay()
       document.addEventListener('touchstart', onInteract, { once: true })
       document.addEventListener('click', onInteract, { once: true })
     }
@@ -41,10 +47,8 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
 
   return (
     <>
-      {/* Fallback dark background — shown until video plays */}
       <div className="absolute inset-0 bg-zinc-950" />
 
-      {/* Desktop (landscape) — hidden until playing so no play button shows */}
       <video
         ref={desktopRef}
         src={desktopSrc}
@@ -59,7 +63,6 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
         }`}
       />
 
-      {/* Mobile (vertical) — hidden until playing so no play button shows */}
       <video
         ref={mobileRef}
         src={mobileSrc}

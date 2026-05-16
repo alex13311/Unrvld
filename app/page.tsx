@@ -14,21 +14,21 @@ const services = [
     title: 'Videography',
     cta: 'View Work',
     href: '/work',
-    body: 'Cinematic visuals and reels built to make your brand look premium.',
+    body: 'Cinematic car content, personal brand films, and commercial visuals that make your brand impossible to ignore.',
   },
   {
     number: '02',
     title: 'Photography',
     cta: 'View Work',
     href: '/work',
-    body: 'High-end photo content that elevates your brand at every touchpoint.',
+    body: 'High-end imagery for automotive, personal branding, and commercial campaigns.',
   },
   {
     number: '03',
-    title: 'Social Media & Strategy',
+    title: 'Social Media & Brand Strategy',
     cta: 'Learn More',
     href: '/about',
-    body: 'Content management and brand strategy that keeps you consistent and sharp.',
+    body: 'Content strategy, brand positioning, and social management that keeps you consistent, relevant, and ahead.',
   },
 ]
 
