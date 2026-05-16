@@ -17,7 +17,13 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
     if (!video) return
 
     video.muted = true
-    video.play().catch(() => {})
+    video.load()
+
+    const tryPlay = () => video.play().catch(() => {})
+
+    video.addEventListener('loadedmetadata', tryPlay, { once: true })
+    video.addEventListener('canplay', tryPlay, { once: true })
+    tryPlay()
 
     const unlock = () => video.play().catch(() => {})
     document.addEventListener('touchstart', unlock, { once: true })
@@ -28,6 +34,11 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
       document.removeEventListener('pointerdown', unlock)
     }
   }, [])
+
+  const forceFirstFrame = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    // Forces iOS to decode and display the first frame before playback starts
+    e.currentTarget.currentTime = 0.001
+  }
 
   return (
     <>
@@ -41,6 +52,7 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
         loop
         playsInline
         preload="auto"
+        onLoadedData={forceFirstFrame}
         style={{ pointerEvents: 'none' }}
         className="absolute inset-0 hidden h-full w-full object-cover md:block"
       />
@@ -53,6 +65,7 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
         loop
         playsInline
         preload="auto"
+        onLoadedData={forceFirstFrame}
         style={{ pointerEvents: 'none' }}
         className="absolute inset-0 block h-full w-full object-cover md:hidden"
       />
