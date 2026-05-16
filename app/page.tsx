@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import HeroVideo from '@/components/hero-video'
 
 const capabilities = [
@@ -33,10 +34,10 @@ const services = [
 ]
 
 const featured = [
-  { title: 'Diablo x UNRVLD', category: 'Automotive Videography' },
-  { title: 'Founder Personal Brand Launch', category: 'Personal Branding' },
-  { title: 'Premium Brand Campaign', category: 'Commercial Film' },
-  { title: 'High-End Product Shoot', category: 'Photography' },
+  { title: 'Diablo x UNRVLD', category: 'Automotive Videography', image: null },
+  { title: 'Founder Personal Brand Launch', category: 'Personal Branding', image: null },
+  { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null },
+  { title: 'High-End Product Shoot', category: 'Photography', image: { src: '/IMG_7778.webp', width: 1800, height: 1200 } },
 ]
 
 export default function HomePage() {
@@ -155,7 +156,13 @@ export default function HomePage() {
                 href="/work"
                 className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] transition hover:border-white/20"
               >
-                <div className="aspect-[16/10] bg-[linear-gradient(135deg,rgba(90,0,0,0.3),rgba(255,255,255,0.02),rgba(0,0,0,0.7))] transition group-hover:opacity-90" />
+                {item.image ? (
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <Image src={item.image.src} alt={item.title} fill className="object-cover transition group-hover:opacity-90" />
+                  </div>
+                ) : (
+                  <div className="aspect-[16/10] bg-[linear-gradient(135deg,rgba(90,0,0,0.3),rgba(255,255,255,0.02),rgba(0,0,0,0.7))] transition group-hover:opacity-90" />
+                )}
                 <div className="p-6">
                   <p className="text-[11px] uppercase tracking-[0.3em] text-white/35">
                     {item.category}
