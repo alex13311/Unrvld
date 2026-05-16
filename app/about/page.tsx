@@ -124,32 +124,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Founder */}
-      <section className="px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-7xl">
-          <p className="mb-14 text-xs uppercase tracking-[0.4em] text-white/35">The Team</p>
-
-          <div className="max-w-xs">
-            {/* Portrait image container — supports vertical photos */}
-            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
-              <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(100,0,0,0.12),transparent_60%)]" />
-              <div className="absolute bottom-6 left-6">
-                <div className="h-px w-8 bg-red-800/60" />
-              </div>
-            </div>
-
-            <h3 className="mt-7 text-xl font-medium">Alex Erwin</h3>
-            <p className="mt-1 text-[11px] uppercase tracking-[0.3em] text-white/35">
-              Founder // CEO
-            </p>
-            <p className="mt-5 text-sm leading-7 text-white/55">
-              Alex founded UNRVLD to bring premium-grade creative execution to brands that are
-              ready to stop looking average. He oversees media, web, and strategy for every
-              client engagement.
-            </p>
-          </div>
-        </div>
-      </section>
 
       {/* CTA */}
       <section className="border-t border-white/10 px-6 py-20 text-center">
