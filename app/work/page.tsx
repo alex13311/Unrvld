@@ -14,7 +14,7 @@ const videographySections = [
     landscape: true,
     videos: [
       { mobileSrc: '/g550 9.mp4', desktopSrc: '/g550 9.mp4' },
-      null,
+      { mobileSrc: '/g550 8.mp4', desktopSrc: '/g550 8.mp4' },
       null,
     ],
   },
