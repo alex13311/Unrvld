@@ -11,8 +11,8 @@ const videographySections = [
     title: 'Premium Automotive',
     tagline: 'Cinematic car content engineered to generate leads and stop the scroll.',
     videos: [
-      { title: '', src: '/Diablo UNRVLD (1).mp4', mobileOnly: false },
-      { title: '', src: '/copy_198A9F6B-1AE5-4ECF-81BE-38850451BF73 (1).mov', mobileOnly: true },
+      { mobileSrc: '/Diablo UNRVLD (1).mp4', desktopSrc: null },
+      { mobileSrc: '/copy_198A9F6B-1AE5-4ECF-81BE-38850451BF73 (1).mov', desktopSrc: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov' },
       null,
     ],
   },
@@ -68,43 +68,34 @@ export default function WorkPage() {
                   {section.videos.map((video, i) =>
                     video ? (
                       <div key={i} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-                        {/* Mobile: show video */}
-                        <div className={`relative aspect-[9/16] w-full overflow-hidden md:hidden`}>
-                          <video
-                            src={video.src}
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            preload="auto"
-                            style={{ pointerEvents: 'none' }}
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                        {/* Desktop: show video or Coming Soon if mobileOnly */}
-                        {video.mobileOnly ? (
-                          <div className="hidden md:flex aspect-video items-center justify-center">
-                            <p className="text-xs uppercase tracking-[0.25em] text-white/20">
-                              Coming Soon
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="relative hidden aspect-video w-full overflow-hidden md:block">
+                        {/* Mobile */}
+                        {video.mobileSrc ? (
+                          <div className="relative aspect-[9/16] w-full overflow-hidden md:hidden">
                             <video
-                              src={video.src}
-                              autoPlay
-                              muted
-                              loop
-                              playsInline
-                              preload="auto"
+                              src={video.mobileSrc}
+                              autoPlay muted loop playsInline preload="auto"
                               style={{ pointerEvents: 'none' }}
                               className="h-full w-full object-cover"
                             />
                           </div>
+                        ) : (
+                          <div className="flex aspect-[9/16] items-center justify-center md:hidden">
+                            <p className="text-xs uppercase tracking-[0.25em] text-white/20">Coming Soon</p>
+                          </div>
                         )}
-                        {video.title && (
-                          <div className="p-4">
-                            <p className="text-sm font-medium">{video.title}</p>
+                        {/* Desktop */}
+                        {video.desktopSrc ? (
+                          <div className="relative hidden aspect-video w-full overflow-hidden md:block">
+                            <video
+                              src={video.desktopSrc}
+                              autoPlay muted loop playsInline preload="auto"
+                              style={{ pointerEvents: 'none' }}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="hidden md:flex aspect-video items-center justify-center">
+                            <p className="text-xs uppercase tracking-[0.25em] text-white/20">Coming Soon</p>
                           </div>
                         )}
                       </div>
