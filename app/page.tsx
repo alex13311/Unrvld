@@ -309,8 +309,8 @@ export default function HomePage() {
               <a href="mailto:hello@unrvldgroup.com" className="block hover:text-white">
                 hello@unrvldgroup.com
               </a>
-              <a href="https://instagram.com/unrvldgroup" className="block hover:text-white">
-                @unrvldgroup
+              <a href="https://instagram.com/unrvldproductions" className="block hover:text-white">
+                @unrvldproductions
               </a>
             </div>
           </div>
