@@ -123,8 +123,16 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-col items-start md:items-end">
-            <div className="aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2rem] border border-white/10 bg-white/5">
-              <div className="flex h-full items-end bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.08))] p-6">
+            <div className="relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2rem] border border-white/10 bg-white/5">
+              <video
+                className="h-full w-full object-cover"
+                autoPlay
+                loop
+                muted
+                playsInline
+                src="/hero-reel.mp4"
+              />
+              <div className="absolute inset-x-0 bottom-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-6">
                 <div>
                   <p className="text-xs uppercase tracking-[0.25em] text-white/45">
                     UNRVLD Standard
