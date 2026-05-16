@@ -34,10 +34,10 @@ const services = [
 ]
 
 const featured = [
-  { title: 'Diablo x UNRVLD', category: 'Automotive Videography', image: null },
-  { title: 'Founder Personal Brand Launch', category: 'Personal Branding', image: null },
-  { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null },
-  { title: 'High-End Product Shoot', category: 'Photography', image: { src: '/IMG_7778.webp', width: 1800, height: 1200 } },
+  { title: 'Diablo x UNRVLD', category: 'Automotive Videography', image: null, video: null },
+  { title: 'Founder Personal Brand Launch', category: 'Personal Branding', image: null, video: null },
+  { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null, video: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov' },
+  { title: 'High-End Product Shoot', category: 'Photography', image: { src: '/IMG_7778.webp', width: 1800, height: 1200 }, video: null },
 ]
 
 export default function HomePage() {
@@ -156,7 +156,11 @@ export default function HomePage() {
                 href="/work"
                 className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] transition hover:border-white/20"
               >
-                {item.image ? (
+                {item.video ? (
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <video src={item.video} autoPlay muted loop playsInline preload="auto" style={{ pointerEvents: 'none' }} className="h-full w-full object-cover transition group-hover:opacity-90" />
+                  </div>
+                ) : item.image ? (
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <Image src={item.image.src} alt={item.title} fill className="object-cover transition group-hover:opacity-90" />
                   </div>
