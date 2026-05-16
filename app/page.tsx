@@ -46,24 +46,34 @@ export default function HomePage() {
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(100,0,0,0.18),transparent_55%)]" />
 
       {/* Hero */}
-      <section className="px-6 pb-28 pt-20 md:pb-36 md:pt-32">
-        <div className="mx-auto grid max-w-7xl gap-16 md:grid-cols-[1.3fr_0.7fr] md:items-end">
-          <div>
-            <p className="mb-8 text-xs uppercase tracking-[0.4em] text-white/35">
+      <section className="relative flex min-h-[90vh] items-end overflow-hidden">
+        {/* Background video */}
+        <video
+          src="/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.4)_50%,rgba(0,0,0,0.2)_100%)]" />
+
+        {/* Content */}
+        <div className="relative w-full px-6 pb-20 pt-40">
+          <div className="mx-auto max-w-7xl">
+            <p className="mb-8 text-xs uppercase tracking-[0.4em] text-white/50">
               Beverly Hills // Digital
             </p>
-
-            <h1 className="text-5xl font-medium leading-[0.9] tracking-tight md:text-7xl lg:text-[6rem]">
+            <h1 className="max-w-4xl text-5xl font-medium leading-[0.9] tracking-tight md:text-7xl lg:text-[6rem]">
               Where Presence
               <br />
               Becomes Power.
             </h1>
-
-            <p className="mt-10 max-w-lg text-base leading-7 text-white/60 md:text-lg">
+            <p className="mt-10 max-w-lg text-base leading-7 text-white/65 md:text-lg">
               UNRVLD builds premium media, websites, and digital systems for brands
               that want to look sharper, move faster, and command attention.
             </p>
-
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
                 href="/work"
@@ -73,27 +83,11 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/contact"
-                className="rounded-full border border-white/25 px-7 py-3 text-xs uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black"
+                className="rounded-full border border-white/30 px-7 py-3 text-xs uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black"
               >
                 Start Project
               </Link>
             </div>
-          </div>
-
-          <div className="flex flex-col items-start md:items-end">
-            <div className="aspect-[4/5] w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
-              <div className="flex h-full flex-col justify-end bg-[linear-gradient(160deg,rgba(100,0,0,0.15),transparent_50%)] p-7">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/35">
-                  UNRVLD Standard
-                </p>
-                <p className="mt-3 text-sm leading-6 text-white/60">
-                  Built for brands that refuse to look average.
-                </p>
-              </div>
-            </div>
-            <span className="mt-5 text-[10px] uppercase tracking-[0.4em] text-white/25">
-              Scroll
-            </span>
           </div>
         </div>
       </section>
