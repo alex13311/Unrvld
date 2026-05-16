@@ -47,18 +47,21 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative flex min-h-[90vh] items-end overflow-hidden">
-        {/* Background video */}
+        {/* Desktop video (landscape) */}
         <video
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 hidden h-full w-full object-cover md:block"
         >
           <source src="/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov" type="video/mp4" />
           <source src="/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov" type="video/quicktime" />
         </video>
+
+        {/* Mobile fallback — dark gradient until vertical video is added */}
+        <div className="absolute inset-0 bg-zinc-950 md:hidden" />
         {/* Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.4)_50%,rgba(0,0,0,0.2)_100%)]" />
 
