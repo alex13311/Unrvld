@@ -11,7 +11,7 @@ const videographySections = [
     title: 'Premium Automotive',
     tagline: 'Cinematic car content engineered to generate leads and stop the scroll.',
     videos: [
-      null,
+      { title: '', src: '/Diablo UNRVLD (1).mp4' },
       null,
       null,
     ],
@@ -83,9 +83,11 @@ export default function WorkPage() {
                             className="h-full w-full object-cover"
                           />
                         </div>
-                        <div className="p-4">
-                          <p className="text-sm font-medium">{video.title}</p>
-                        </div>
+                        {video.title && (
+                          <div className="p-4">
+                            <p className="text-sm font-medium">{video.title}</p>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div
