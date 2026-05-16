@@ -60,8 +60,18 @@ export default function HomePage() {
           <source src="/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mov" type="video/quicktime" />
         </video>
 
-        {/* Mobile fallback — dark gradient until vertical video is added */}
-        <div className="absolute inset-0 bg-zinc-950 md:hidden" />
+        {/* Mobile video (vertical) */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 block h-full w-full object-cover md:hidden"
+        >
+          <source src="/copy_88BA4376-9531-4C22-B01D-7521382366F6.mov" type="video/mp4" />
+          <source src="/copy_88BA4376-9531-4C22-B01D-7521382366F6.mov" type="video/quicktime" />
+        </video>
         {/* Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.4)_50%,rgba(0,0,0,0.2)_100%)]" />
 
