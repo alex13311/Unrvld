@@ -71,7 +71,7 @@ export default function WorkPage() {
                         key={i}
                         className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]"
                       >
-                        <div className="relative aspect-video w-full overflow-hidden">
+                        <div className="relative aspect-[9/16] w-full overflow-hidden md:aspect-video">
                           <video
                             src={video.src}
                             autoPlay
