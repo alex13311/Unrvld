@@ -14,35 +14,40 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
   const [mobilePlaying, setMobilePlaying] = useState(false)
 
   useEffect(() => {
-    const setup = (
-      video: HTMLVideoElement | null,
-      setPlaying: (v: boolean) => void,
-    ) => {
-      if (!video) return
+    const isMobile = window.innerWidth < 768
+    const primary = isMobile ? mobileRef.current : desktopRef.current
+    const secondary = isMobile ? desktopRef.current : mobileRef.current
+    const setPrimary = isMobile ? setMobilePlaying : setDesktopPlaying
+
+    const tryPlay = (video: HTMLVideoElement, setPlaying: (v: boolean) => void) => {
       video.muted = true
-
-      const tryPlay = () => {
-        video.play().then(() => setPlaying(true)).catch(() => {})
-      }
-
-      // Force the browser to start loading immediately (don't wait for scroll)
       video.load()
-
-      video.addEventListener('loadedmetadata', tryPlay, { once: true })
-      video.addEventListener('canplay', tryPlay, { once: true })
-      video.addEventListener('playing', () => setPlaying(true))
-
-      // Try right away too
-      tryPlay()
-
-      // Fallback on first interaction
-      const onInteract = () => tryPlay()
-      document.addEventListener('touchstart', onInteract, { once: true })
-      document.addEventListener('click', onInteract, { once: true })
+      const attempt = () => {
+        video.play()
+          .then(() => setPlaying(true))
+          .catch(() => {})
+      }
+      attempt()
+      video.addEventListener('loadedmetadata', attempt, { once: true })
+      video.addEventListener('canplay', attempt, { once: true })
+      video.addEventListener('playing', () => setPlaying(true), { once: true })
     }
 
-    setup(desktopRef.current, setDesktopPlaying)
-    setup(mobileRef.current, setMobilePlaying)
+    if (primary) tryPlay(primary, setPrimary)
+    // Load secondary silently in background
+    if (secondary) { secondary.muted = true; secondary.load() }
+
+    // Unlock on any interaction
+    const unlock = () => {
+      if (primary) primary.play().then(() => setPrimary(true)).catch(() => {})
+    }
+    document.addEventListener('touchstart', unlock, { once: true })
+    document.addEventListener('pointerdown', unlock, { once: true })
+
+    return () => {
+      document.removeEventListener('touchstart', unlock)
+      document.removeEventListener('pointerdown', unlock)
+    }
   }, [])
 
   return (
@@ -58,7 +63,7 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
         playsInline
         preload="auto"
         style={{ pointerEvents: 'none' }}
-        className={`absolute inset-0 hidden h-full w-full object-cover transition-opacity duration-700 md:block ${
+        className={`absolute inset-0 hidden h-full w-full object-cover transition-opacity duration-500 md:block ${
           desktopPlaying ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -72,7 +77,7 @@ export default function HeroVideo({ desktopSrc, mobileSrc }: HeroVideoProps) {
         playsInline
         preload="auto"
         style={{ pointerEvents: 'none' }}
-        className={`absolute inset-0 block h-full w-full object-cover transition-opacity duration-700 md:hidden ${
+        className={`absolute inset-0 block h-full w-full object-cover transition-opacity duration-500 md:hidden ${
           mobilePlaying ? 'opacity-100' : 'opacity-0'
         }`}
       />
