@@ -44,6 +44,8 @@ const photos = [
   { src: '/IMG_7775.jpeg', width: 1187, height: 1584 },
   { src: '/IMG_7776.jpeg', width: 1186, height: 1596 },
   { src: '/IMG_7778.webp', width: 1800, height: 1200 },
+  { src: '/911gts1.webp', width: 1800, height: 1012 },
+  { src: '/g63lawn.webp', width: 1800, height: 1202 },
 ]
 
 export default function WorkPage() {
