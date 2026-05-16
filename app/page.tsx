@@ -1,331 +1,248 @@
-// app/page.tsx
-import React from "react";
+import Link from 'next/link'
 
-const brands = [
-  "VIDEOGRAPHY",
-  "PHOTOGRAPHY",
-  "WEB DESIGN",
-  "AI TOOLS",
-  "MEDIA STRATEGY",
-  "CREATIVE DIRECTION",
-];
+const capabilities = [
+  'Videography',
+  'Photography',
+  'Web Design',
+  'AI Tools',
+  'Media Strategy',
+  'Creative Direction',
+]
 
-const features = [
+const services = [
   {
-    number: "01",
-    title: "Media",
-    cta: "View Work",
-    href: "#work",
-    text: "Cinematic visuals, social-first reels, and premium content built to make brands look expensive.",
+    number: '01',
+    title: 'Media',
+    cta: 'View Work',
+    href: '/work',
+    body: 'Cinematic visuals, social-first reels, and premium content built to make brands look expensive.',
   },
   {
-    number: "02",
-    title: "Web",
-    cta: "See Services",
-    href: "#services",
-    text: "Modern websites designed to position your brand properly and convert attention into inquiries.",
+    number: '02',
+    title: 'Web',
+    cta: 'See Services',
+    href: '/work',
+    body: 'Modern websites designed to position your brand properly and convert attention into inquiries.',
   },
   {
-    number: "03",
-    title: "Strategy",
-    cta: "Learn More",
-    href: "#brand",
-    text: "AI workflows, creative systems, and digital positioning that help brands move faster and operate sharper.",
+    number: '03',
+    title: 'Strategy',
+    cta: 'Learn More',
+    href: '/about',
+    body: 'AI workflows, creative systems, and digital positioning that help brands move faster and operate sharper.',
   },
-];
+]
 
-const portfolio = [
-  {
-    title: "Luxury Automotive Campaign",
-    category: "Cinematic Reel",
-  },
-  {
-    title: "Premium Brand Website",
-    category: "Web Design",
-  },
-  {
-    title: "Founder Personal Brand Launch",
-    category: "Media Strategy",
-  },
-  {
-    title: "High-End Product Shoot",
-    category: "Photography",
-  },
-];
+const featured = [
+  { title: 'Luxury Automotive Campaign', category: 'Cinematic Reel' },
+  { title: 'Premium Brand Website', category: 'Web Design' },
+  { title: 'Founder Personal Brand Launch', category: 'Media Strategy' },
+  { title: 'High-End Product Shoot', category: 'Photography' },
+]
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(120,0,0,0.22),transparent_35%),linear-gradient(to_bottom,#090909,#000)]" />
+    <div className="relative min-h-screen">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(100,0,0,0.18),transparent_55%)]" />
 
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <a href="#" className="text-lg font-semibold tracking-[0.35em]">
-            UNRVLD
-          </a>
-
-          <nav className="hidden gap-8 text-sm uppercase tracking-[0.2em] md:flex">
-            <a href="#services" className="text-white/80 transition hover:text-white">
-              Services
-            </a>
-            <a href="#work" className="text-white/80 transition hover:text-white">
-              Work
-            </a>
-            <a href="#brand" className="text-white/80 transition hover:text-white">
-              Our Brand
-            </a>
-            <a href="#contact" className="text-white/80 transition hover:text-white">
-              Contact
-            </a>
-          </nav>
-
-          <a
-            href="#contact"
-            className="rounded-full border border-white/20 px-5 py-2 text-xs uppercase tracking-[0.2em] text-white transition hover:border-white hover:bg-white hover:text-black"
-          >
-            Book a Call
-          </a>
-        </div>
-      </header>
-
-      <section className="relative overflow-hidden px-6 pb-24 pt-20 md:pb-32 md:pt-28">
-        <div className="mx-auto grid max-w-7xl gap-14 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+      {/* Hero */}
+      <section className="px-6 pb-28 pt-20 md:pb-36 md:pt-32">
+        <div className="mx-auto grid max-w-7xl gap-16 md:grid-cols-[1.3fr_0.7fr] md:items-end">
           <div>
-            <p className="mb-6 text-xs uppercase tracking-[0.35em] text-white/45">
-              Los Angeles / Digital
+            <p className="mb-8 text-xs uppercase tracking-[0.4em] text-white/35">
+              Beverly Hills // Digital
             </p>
 
-            <h1 className="max-w-4xl text-5xl font-medium leading-[0.92] tracking-tight md:text-7xl lg:text-[6.5rem]">
+            <h1 className="text-5xl font-medium leading-[0.9] tracking-tight md:text-7xl lg:text-[6rem]">
               Where Presence
               <br />
               Becomes Power.
             </h1>
 
-            <p className="mt-8 max-w-xl text-base leading-7 text-white/70 md:text-lg">
+            <p className="mt-10 max-w-lg text-base leading-7 text-white/60 md:text-lg">
               UNRVLD builds premium media, websites, and digital systems for brands
               that want to look sharper, move faster, and command attention.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-4">
-              <a
-                href="#work"
-                className="rounded-full bg-white px-6 py-3 text-sm font-medium uppercase tracking-[0.18em] text-black transition hover:opacity-90"
+              <Link
+                href="/work"
+                className="rounded-full bg-white px-7 py-3 text-xs font-medium uppercase tracking-[0.2em] text-black transition hover:opacity-85"
               >
                 View Work
-              </a>
-              <a
-                href="#contact"
-                className="rounded-full border border-white/20 px-6 py-3 text-sm uppercase tracking-[0.18em] text-white transition hover:border-white hover:bg-white hover:text-black"
+              </Link>
+              <Link
+                href="/contact"
+                className="rounded-full border border-white/25 px-7 py-3 text-xs uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black"
               >
                 Start Project
-              </a>
+              </Link>
             </div>
           </div>
 
           <div className="flex flex-col items-start md:items-end">
-            <div className="aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2rem] border border-white/10 bg-white/5">
-              <div className="flex h-full items-end bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.08))] p-6">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/45">
-                    UNRVLD Standard
-                  </p>
-                  <p className="mt-3 max-w-xs text-sm leading-6 text-white/75">
-                    Built for brands that do not want to look average.
-                  </p>
-                </div>
+            <div className="aspect-[4/5] w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
+              <div className="flex h-full flex-col justify-end bg-[linear-gradient(160deg,rgba(100,0,0,0.15),transparent_50%)] p-7">
+                <p className="text-xs uppercase tracking-[0.3em] text-white/35">
+                  UNRVLD Standard
+                </p>
+                <p className="mt-3 text-sm leading-6 text-white/60">
+                  Built for brands that refuse to look average.
+                </p>
               </div>
             </div>
-
-            <span className="mt-5 text-xs uppercase tracking-[0.3em] text-white/35">
+            <span className="mt-5 text-[10px] uppercase tracking-[0.4em] text-white/25">
               Scroll
             </span>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-white/10 py-8">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-4 px-6">
-          {brands.map((brand) => (
-            <span
-              key={brand}
-              className="text-sm uppercase tracking-[0.3em] text-white/40"
-            >
-              {brand}
+      {/* Capability Strip */}
+      <section className="border-y border-white/10 py-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-6">
+          {capabilities.map((cap, i) => (
+            <span key={cap} className="flex items-center gap-8">
+              <span className="text-[11px] uppercase tracking-[0.3em] text-white/35">
+                {cap}
+              </span>
+              {i < capabilities.length - 1 && (
+                <span className="text-white/15">·</span>
+              )}
             </span>
           ))}
         </div>
       </section>
 
-      <section id="services" className="px-6 py-20 md:py-28">
+      {/* Services */}
+      <section className="px-6 py-24 md:py-32">
         <div className="mx-auto max-w-7xl">
-          <p className="mb-12 text-xs uppercase tracking-[0.35em] text-white/40">
+          <p className="mb-14 text-xs uppercase tracking-[0.4em] text-white/35">
             What We Do
           </p>
 
-          <div className="grid gap-px overflow-hidden rounded-[2rem] border border-white/10 bg-white/10 md:grid-cols-3">
-            {features.map((item) => (
-              <div key={item.number} className="bg-black p-8 md:p-10">
-                <div className="text-sm text-white/35">{item.number}</div>
-                <h3 className="mt-6 text-3xl font-medium">{item.title}</h3>
-                <p className="mt-5 max-w-sm text-sm leading-7 text-white/65">
-                  {item.text}
-                </p>
-                <a
-                  href={item.href}
-                  className="mt-8 inline-block text-sm uppercase tracking-[0.2em] text-white underline-offset-4 hover:underline"
+          <div className="grid gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] md:grid-cols-3">
+            {services.map((s) => (
+              <div key={s.number} className="bg-black p-8 md:p-10">
+                <div className="mb-6 h-px w-8 bg-red-800/70" />
+                <p className="text-xs text-white/25">{s.number}</p>
+                <h3 className="mt-5 text-3xl font-medium">{s.title}</h3>
+                <p className="mt-5 text-sm leading-7 text-white/55">{s.body}</p>
+                <Link
+                  href={s.href}
+                  className="mt-8 inline-block text-xs uppercase tracking-[0.25em] text-white/70 underline-offset-4 transition hover:text-white hover:underline"
                 >
-                  {item.cta}
-                </a>
+                  {s.cta}
+                </Link>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="work" className="px-6 py-20 md:py-28">
+      {/* Portfolio Teaser */}
+      <section className="px-6 pb-24 md:pb-32">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 flex items-end justify-between gap-6">
             <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-white/40">
+              <p className="mb-4 text-xs uppercase tracking-[0.4em] text-white/35">
                 Selected Work
               </p>
-              <h2 className="mt-4 text-3xl font-medium md:text-5xl">
+              <h2 className="text-3xl font-medium md:text-5xl">
                 Built To Look Untouchable
               </h2>
             </div>
-            <a
-              href="#contact"
-              className="hidden text-sm uppercase tracking-[0.2em] text-white/70 md:block"
+            <Link
+              href="/work"
+              className="hidden shrink-0 text-xs uppercase tracking-[0.25em] text-white/45 transition hover:text-white md:block"
             >
-              Let’s Work
-            </a>
+              View All →
+            </Link>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {portfolio.map((item, idx) => (
-              <div
-                key={`${item.title}-${idx}`}
-                className="group overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03]"
+          <div className="grid gap-5 md:grid-cols-2">
+            {featured.map((item, i) => (
+              <Link
+                key={i}
+                href="/work"
+                className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] transition hover:border-white/20"
               >
-                <div className="aspect-[16/10] bg-[linear-gradient(135deg,rgba(110,0,0,0.28),rgba(255,255,255,0.03),rgba(0,0,0,0.8))]" />
+                <div className="aspect-[16/10] bg-[linear-gradient(135deg,rgba(90,0,0,0.3),rgba(255,255,255,0.02),rgba(0,0,0,0.7))] transition group-hover:opacity-90" />
                 <div className="p-6">
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/40">
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-white/35">
                     {item.category}
                   </p>
-                  <h3 className="mt-3 text-2xl font-medium transition group-hover:text-white/80">
+                  <h3 className="mt-2 text-xl font-medium transition group-hover:text-white/80">
                     {item.title}
                   </h3>
                 </div>
-              </div>
+              </Link>
             ))}
+          </div>
+
+          <div className="mt-8 text-center md:hidden">
+            <Link
+              href="/work"
+              className="text-xs uppercase tracking-[0.25em] text-white/45 transition hover:text-white"
+            >
+              View All Work →
+            </Link>
           </div>
         </div>
       </section>
 
-      <section
-        id="brand"
-        className="border-y border-white/10 px-6 py-20 md:py-28"
-      >
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[0.8fr_1.2fr]">
+      {/* Brand Story */}
+      <section className="border-y border-white/10 px-6 py-24 md:py-32">
+        <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-[0.9fr_1.1fr] md:items-center">
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-white/40">
-              Our Brand
-            </p>
-            <h2 className="mt-4 text-3xl font-medium md:text-5xl">
-              We Don’t Make Content.
+            <p className="mb-5 text-xs uppercase tracking-[0.4em] text-white/35">Our Brand</p>
+            <h2 className="text-3xl font-medium leading-tight md:text-5xl">
+              We Don&apos;t Make Content.
               <br />
               We Build Presence.
             </h2>
           </div>
 
-          <div className="max-w-2xl text-base leading-8 text-white/70 md:text-lg">
-            UNRVLD is a premium media and digital brand focused on helping businesses,
-            founders, and operators present themselves at a higher level. Through
-            cinematic visuals, modern web design, and strategic systems, we create
-            assets that strengthen perception and turn attention into leverage.
+          <div>
+            <p className="text-base leading-8 text-white/60 md:text-lg">
+              UNRVLD is a premium media and digital brand that helps businesses, founders,
+              and operators present themselves at a higher level. Through cinematic visuals,
+              modern web design, and strategic systems, we create assets that strengthen
+              perception and turn attention into leverage.
+            </p>
+            <Link
+              href="/about"
+              className="mt-7 inline-block text-xs uppercase tracking-[0.25em] text-white/50 transition hover:text-white"
+            >
+              Read Our Story →
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-28">
-        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(120,0,0,0.18),rgba(255,255,255,0.04))] p-8 md:p-14">
-          <p className="text-xs uppercase tracking-[0.35em] text-white/40">
+      {/* CTA */}
+      <section className="px-6 py-24 md:py-32">
+        <div className="mx-auto max-w-7xl rounded-3xl border border-white/10 bg-[linear-gradient(135deg,rgba(100,0,0,0.15),rgba(255,255,255,0.03))] p-10 md:p-16">
+          <p className="mb-6 text-xs uppercase tracking-[0.4em] text-white/35">
             Ready To Build?
           </p>
-          <h2 className="mt-5 max-w-4xl text-3xl font-medium leading-tight md:text-6xl">
+          <h2 className="max-w-3xl text-3xl font-medium leading-tight md:text-6xl">
             If your brand looks average,
             <br />
             it gets treated average.
           </h2>
-          <p className="mt-6 max-w-2xl text-base leading-7 text-white/70">
-            Whether you need content, a site, or a sharper digital presence, UNRVLD
+          <p className="mt-7 max-w-xl text-base leading-7 text-white/55">
+            Whether you need content, a site, or a sharper digital presence — UNRVLD
             builds assets designed to elevate perception and drive serious inquiries.
           </p>
-          <a
-            href="#contact"
-            className="mt-10 inline-flex rounded-full bg-white px-7 py-3 text-sm font-medium uppercase tracking-[0.18em] text-black transition hover:opacity-90"
+          <Link
+            href="/contact"
+            className="mt-10 inline-flex rounded-full bg-white px-8 py-3 text-xs font-medium uppercase tracking-[0.2em] text-black transition hover:opacity-85"
           >
             Start Your Project
-          </a>
+          </Link>
         </div>
       </section>
-
-      <footer
-        id="contact"
-        className="border-t border-white/10 px-6 py-14 text-sm text-white/65"
-      >
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-4">
-          <div>
-            <div className="text-lg font-semibold tracking-[0.35em] text-white">
-              UNRVLD
-            </div>
-            <p className="mt-4 max-w-xs leading-7 text-white/55">
-              Media. Design. Strategy.
-            </p>
-          </div>
-
-          <div>
-            <p className="mb-4 text-xs uppercase tracking-[0.25em] text-white/40">
-              Quick Nav
-            </p>
-            <div className="space-y-3">
-              <a href="#services" className="block hover:text-white">
-                Services
-              </a>
-              <a href="#work" className="block hover:text-white">
-                Work
-              </a>
-              <a href="#brand" className="block hover:text-white">
-                Our Brand
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-4 text-xs uppercase tracking-[0.25em] text-white/40">
-              Contact
-            </p>
-            <div className="space-y-3">
-              <a href="mailto:hello@unrvldgroup.com" className="block hover:text-white">
-                hello@unrvldgroup.com
-              </a>
-              <a href="https://instagram.com/unrvldgroup" className="block hover:text-white">
-                @unrvldgroup
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-4 text-xs uppercase tracking-[0.25em] text-white/40">
-              Serious Inquiries
-            </p>
-            <p className="leading-7 text-white/55">
-              Use the contact form or email directly to discuss media, websites,
-              strategy, or custom retainers.
-            </p>
-          </div>
-        </div>
-      </footer>
-    </main>
-  );
+    </div>
+  )
 }
