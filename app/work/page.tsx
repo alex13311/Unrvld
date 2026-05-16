@@ -17,14 +17,22 @@ const videographySections = [
       { mobileSrc: '/iceman 2 (1).mp4', desktopSrc: null },
     ],
   },
+  {
+    title: 'Premium Brand Campaign',
+    tagline: 'Story-driven visuals built to make your brand unforgettable.',
+    videos: [
+      { mobileSrc: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4', desktopSrc: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4' },
+      null,
+      null,
+    ],
+  },
 ]
 
 const photos = [
   { src: '/IMG_7774.jpeg', width: 1206, height: 1592 },
-  { src: '/IMG_7778.webp', width: 1800, height: 1200 },
   { src: '/IMG_7775.jpeg', width: 1187, height: 1584 },
-  { src: '/IMG_7777.webp', width: 1800, height: 1012 },
   { src: '/IMG_7776.jpeg', width: 1186, height: 1596 },
+  { src: '/IMG_7778.webp', width: 1800, height: 1200 },
 ]
 
 export default function WorkPage() {
