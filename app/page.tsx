@@ -48,7 +48,7 @@ export default function HomePage() {
       <section className="relative flex min-h-[90vh] items-end overflow-hidden">
         <HeroVideo
           desktopSrc="/copy_88BA4376-9531-4C22-B01D-7521382366F6.mov"
-          mobileSrc="/copy_BDDBCF41-EAC7-4BCF-BE32-ABBC0753A4D5 2 (1).mov"
+          mobileSrc="/UNRVLD BACKROUND (1).mp4"
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.4)_50%,rgba(0,0,0,0.2)_100%)]" />
