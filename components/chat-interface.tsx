@@ -54,6 +54,7 @@ export default function ChatInterface({ userName, userImage }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const [stars] = useState(() =>
     Array.from({ length: 180 }, (_, i) => ({
@@ -90,34 +91,56 @@ export default function ChatInterface({ userName, userImage }: Props) {
     el.style.height = Math.min(el.scrollHeight, 200) + 'px'
   }, [])
 
-  function speak(text: string) {
-    if (!ttsEnabled || typeof window === 'undefined' || !window.speechSynthesis) return
-    window.speechSynthesis.cancel()
+  async function speak(text: string) {
+    if (!ttsEnabled) return
+    stopSpeaking()
     const clean = stripMarkdown(text)
+    if (!clean.trim()) return
+    setSpeaking(true)
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: clean }),
+      })
+      if (res.status === 503 || !res.ok) {
+        // ElevenLabs not configured — fall back to browser TTS
+        browserSpeak(clean)
+        return
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+      audioRef.current = audio
+      audio.onended = () => { setSpeaking(false); URL.revokeObjectURL(url) }
+      audio.onerror = () => { setSpeaking(false); URL.revokeObjectURL(url) }
+      await audio.play()
+    } catch {
+      browserSpeak(clean)
+    }
+  }
+
+  function browserSpeak(clean: string) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) { setSpeaking(false); return }
     const utter = new SpeechSynthesisUtterance(clean)
     utter.rate = 0.88
     utter.pitch = 0.75
-    utter.volume = 1
     const voices = window.speechSynthesis.getVoices()
-    const preferred = voices.find(v =>
-      v.name.toLowerCase().includes('daniel') ||
-      v.name.toLowerCase().includes('reed') ||
-      v.name.toLowerCase().includes('oliver') ||
-      v.name.toLowerCase().includes('david') ||
-      (v.lang === 'en-US' && v.name.toLowerCase().includes('male'))
-    ) || voices.find(v => v.lang.startsWith('en'))
+    const preferred = voices.find(v => v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('david') || (v.lang === 'en-US' && v.name.toLowerCase().includes('male'))) || voices.find(v => v.lang.startsWith('en'))
     if (preferred) utter.voice = preferred
-    utter.onstart = () => setSpeaking(true)
     utter.onend = () => setSpeaking(false)
     utter.onerror = () => setSpeaking(false)
     window.speechSynthesis.speak(utter)
   }
 
   function stopSpeaking() {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
-      setSpeaking(false)
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.src = ''
+      audioRef.current = null
     }
+    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel()
+    setSpeaking(false)
   }
 
   function toggleVoice() {
