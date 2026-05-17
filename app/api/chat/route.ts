@@ -7,6 +7,12 @@ const client = new Anthropic()
 
 function buildSystem(memory: string, location?: string) {
   const profile = process.env.USER_PROFILE ?? ''
+  const now = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Los_Angeles',
+  })
+  const time = new Date().toLocaleTimeString('en-US', {
+    hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles', timeZoneName: 'short',
+  })
   const loc = location ? `\n\nUser location: ${location}` : ''
   const prof = profile ? `\n\nUser profile: ${profile}` : ''
   const mem = memory ? `\n\nWhat you remember about this user:\n${memory}` : ''
@@ -15,9 +21,11 @@ function buildSystem(memory: string, location?: string) {
 
 Traits: Direct, no filler, dry wit at 75%, proactive, honesty 90%. Execute first, report back.
 
-You have tools: gmail_list, gmail_read, gmail_send, web_search.
-- Use web_search for weather, news, research, leads, or any real-time info. Always search before saying you don't know.
-- For weather: search "weather [location]" and summarize the result clearly.
+Current date and time: ${now}, ${time}
+
+You have tools: get_weather, gmail_list, gmail_read, gmail_send, web_search.
+- Use get_weather for any weather questions — never use web_search for weather.
+- Use web_search for news, research, leads, or any real-time info.
 - Use gmail tools only when user asks about email.
 - Do not use tools for casual greetings.${loc}${prof}${mem}`
 }
@@ -29,22 +37,12 @@ async function updateMemory(userId: string, existingMemory: string, conversation
       max_tokens: 1024,
       messages: [{
         role: 'user',
-        content: `You are a memory manager for a personal AI assistant. Extract and store important facts about the user from this conversation.
-
-Existing memory:
-${existingMemory || '(none yet)'}
-
-New conversation:
-${conversation}
-
-Update the memory by merging any new facts, preferences, names, goals, or important details the user mentioned. Be concise. Keep under 400 words. Write in third person ("User prefers...", "User's business is...").`,
+        content: `You are a memory manager for a personal AI assistant. Extract and store important facts about the user from this conversation.\n\nExisting memory:\n${existingMemory || '(none yet)'}\n\nNew conversation:\n${conversation}\n\nUpdate the memory by merging any new facts, preferences, names, goals, or important details the user mentioned. Be concise. Keep under 400 words. Write in third person ("User prefers...", "User's business is...").`,
       }],
     })
     const updated = response.content.find((b) => b.type === 'text')
-    if (updated && updated.type === 'text') {
-      await saveMemory(userId, updated.text)
-    }
-  } catch { /* memory update is non-critical */ }
+    if (updated && updated.type === 'text') await saveMemory(userId, updated.text)
+  } catch { /* non-critical */ }
 }
 
 type MessageParam = Anthropic.MessageParam
@@ -97,7 +95,6 @@ export async function POST(req: Request) {
       .map((b) => (b as { type: 'text'; text: string }).text)
       .join('') || 'No response.'
 
-    // Update memory in background
     const convoSummary = messages
       .map((m: { role: string; content: string }) => `${m.role}: ${m.content}`)
       .join('\n')
