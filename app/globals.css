@@ -12,7 +12,7 @@ html, body {
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(212,145,42,0.2); border-radius: 2px; }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
@@ -25,3 +25,20 @@ html, body {
   to { opacity: 1; transform: translateY(0); }
 }
 .fade-up { animation: fade-up 0.25s ease forwards; }
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.85; }
+}
+.star {
+  animation: twinkle var(--duration, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+.scanline {
+  animation: scanline 8s linear infinite;
+}
