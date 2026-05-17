@@ -45,14 +45,25 @@ const textareaClass =
 
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState(false)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { name: '', email: '', message: '' },
   })
 
-  const onSubmit = (_data: FormValues) => {
-    setSubmitted(true)
+  const onSubmit = async (data: FormValues) => {
+    setError(false)
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    if (res.ok) {
+      setSubmitted(true)
+    } else {
+      setError(true)
+    }
   }
 
   if (submitted) {
@@ -195,11 +206,15 @@ export default function ContactForm() {
           )}
         />
 
+        {error && (
+          <p className="text-sm text-red-400">Something went wrong. Please try again or email us directly.</p>
+        )}
         <button
           type="submit"
-          className="w-full rounded-full bg-white py-3 text-xs font-medium uppercase tracking-[0.2em] text-black transition hover:opacity-85"
+          disabled={form.formState.isSubmitting}
+          className="w-full rounded-full bg-white py-3 text-xs font-medium uppercase tracking-[0.2em] text-black transition hover:opacity-85 disabled:opacity-50"
         >
-          Send Message
+          {form.formState.isSubmitting ? 'Sending...' : 'Send Message'}
         </button>
       </form>
     </Form>
