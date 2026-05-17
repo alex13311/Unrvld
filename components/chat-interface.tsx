@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Send, LogOut, RotateCcw, Mic, MicOff, Paperclip, X } from 'lucide-react'
+import { Send, LogOut, RotateCcw, Mic, MicOff, Paperclip, X, Volume2, VolumeX } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 
 interface Message {
@@ -29,6 +29,18 @@ interface Props {
   userImage: string
 }
 
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/#{1,6}\s/g, '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/`{1,3}[^`]*`{1,3}/g, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/^\s*[-*+]\s/gm, '')
+    .replace(/^\s*\d+\.\s/gm, '')
+    .trim()
+}
+
 export default function ChatInterface({ userName, userImage }: Props) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -37,12 +49,22 @@ export default function ChatInterface({ userName, userImage }: Props) {
   const [location, setLocation] = useState<string>('')
   const [listening, setListening] = useState(false)
   const [image, setImage] = useState<ImageData | null>(null)
+  const [ttsEnabled, setTtsEnabled] = useState(true)
+  const [speaking, setSpeaking] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [stars] = useState(() =>
-    Array.from({ length: 140 }, (_, i) => ({ id: i, x: Math.random() * 100, y: Math.random() * 100, size: Math.random() * 1.6 + 0.3, duration: Math.random() * 5 + 2, delay: Math.random() * 6 }))
+    Array.from({ length: 180 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 1.8 + 0.2,
+      duration: Math.random() * 6 + 3,
+      delay: Math.random() * 8,
+      blue: Math.random() > 0.7,
+    }))
   )
 
   useEffect(() => {
@@ -65,8 +87,38 @@ export default function ChatInterface({ userName, userImage }: Props) {
     const el = textareaRef.current
     if (!el) return
     el.style.height = 'auto'
-    el.style.height = Math.min(el.scrollHeight, 160) + 'px'
+    el.style.height = Math.min(el.scrollHeight, 200) + 'px'
   }, [])
+
+  function speak(text: string) {
+    if (!ttsEnabled || typeof window === 'undefined' || !window.speechSynthesis) return
+    window.speechSynthesis.cancel()
+    const clean = stripMarkdown(text)
+    const utter = new SpeechSynthesisUtterance(clean)
+    utter.rate = 0.88
+    utter.pitch = 0.75
+    utter.volume = 1
+    const voices = window.speechSynthesis.getVoices()
+    const preferred = voices.find(v =>
+      v.name.toLowerCase().includes('daniel') ||
+      v.name.toLowerCase().includes('reed') ||
+      v.name.toLowerCase().includes('oliver') ||
+      v.name.toLowerCase().includes('david') ||
+      (v.lang === 'en-US' && v.name.toLowerCase().includes('male'))
+    ) || voices.find(v => v.lang.startsWith('en'))
+    if (preferred) utter.voice = preferred
+    utter.onstart = () => setSpeaking(true)
+    utter.onend = () => setSpeaking(false)
+    utter.onerror = () => setSpeaking(false)
+    window.speechSynthesis.speak(utter)
+  }
+
+  function stopSpeaking() {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+      setSpeaking(false)
+    }
+  }
 
   function toggleVoice() {
     if (listening) { setListening(false); return }
@@ -99,6 +151,7 @@ export default function ChatInterface({ userName, userImage }: Props) {
   async function send(text: string) {
     const trimmed = text.trim()
     if ((!trimmed && !image) || loading) return
+    stopSpeaking()
     const userMsg: Message = { role: 'user', content: trimmed, imageUrl: image?.previewUrl }
     const next = [...messages, userMsg]
     setMessages(next)
@@ -116,8 +169,9 @@ export default function ChatInterface({ userName, userImage }: Props) {
       })
       if (res.status === 401) { setMessages([...next, { role: 'assistant', content: 'Session expired. Please sign in again.' }]); return }
       if (!res.ok) throw new Error('Bad response')
-      const text = await res.text()
-      setMessages([...next, { role: 'assistant', content: text }])
+      const responseText = await res.text()
+      setMessages([...next, { role: 'assistant', content: responseText }])
+      speak(responseText)
     } catch {
       setMessages([...next, { role: 'assistant', content: 'Connection lost. Try again.' }])
     } finally { setLoading(false); setStatus('') }
@@ -129,52 +183,110 @@ export default function ChatInterface({ userName, userImage }: Props) {
 
   const isEmpty = messages.length === 0
   const amber = 'rgba(212,145,42,'
+  const blue = 'rgba(100,160,255,'
 
   return (
-    <div className="flex h-screen flex-col bg-black text-white">
+    <div className="flex h-screen flex-col text-white" style={{ background: '#000912' }}>
+
+      {/* Spaceship background */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        {stars.map((s) => (<div key={s.id} className="star absolute rounded-full" style={{ left: `${s.x}%`, top: `${s.y}%`, width: `${s.size}px`, height: `${s.size}px`, backgroundColor: 'rgba(255,255,255,0.95)', '--duration': `${s.duration}s`, '--delay': `${s.delay}s` } as React.CSSProperties} />))}
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 120% 50% at 50% 110%, rgba(100,50,0,0.18), transparent), radial-gradient(ellipse 60% 40% at 80% 20%, rgba(20,10,40,0.3), transparent)' }} />
+        {/* Hull panel grid */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `linear-gradient(${blue}0.03) 1px, transparent 1px), linear-gradient(90deg, ${blue}0.03) 1px, transparent 1px)`,
+          backgroundSize: '72px 72px',
+        }} />
+        {/* Viewport atmosphere */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: `
+            radial-gradient(ellipse 90% 55% at 15% 85%, rgba(0,20,70,0.55), transparent),
+            radial-gradient(ellipse 70% 45% at 85% 10%, rgba(30,0,80,0.3), transparent),
+            radial-gradient(ellipse 50% 35% at 50% 50%, rgba(0,5,20,0.6), transparent),
+            radial-gradient(ellipse 100% 30% at 50% 100%, rgba(0,10,40,0.7), transparent)
+          `
+        }} />
+        {/* Corner hull glow - amber instrument lighting */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '180px',
+          background: `linear-gradient(to top, ${amber}0.06), transparent)`
+        }} />
+        {/* Horizon glow — like a distant star */}
+        <div style={{
+          position: 'absolute', bottom: '-60px', left: '50%', transform: 'translateX(-50%)',
+          width: '600px', height: '120px',
+          background: `radial-gradient(ellipse, rgba(0,60,140,0.18), transparent 70%)`
+        }} />
+        {/* Stars */}
+        {stars.map((s) => (
+          <div key={s.id} className="star absolute rounded-full" style={{
+            left: `${s.x}%`, top: `${s.y}%`,
+            width: `${s.size}px`, height: `${s.size}px`,
+            backgroundColor: s.blue ? 'rgba(160,200,255,0.9)' : 'rgba(255,255,255,0.95)',
+            '--duration': `${s.duration}s`, '--delay': `${s.delay}s`
+          } as React.CSSProperties} />
+        ))}
+        {/* Subtle scanlines */}
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.07) 0px, transparent 1px, transparent 3px)', backgroundSize: '100% 4px', pointerEvents: 'none' }} />
       </div>
 
-      <header className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderBottom: `1px solid ${amber}0.12)` }}>
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderBottom: `1px solid ${amber}0.15)`, background: 'rgba(0,8,20,0.7)', backdropFilter: 'blur(8px)' }}>
         <div className="flex items-center gap-4">
-          <div style={{ width: '10px', height: '36px', border: `1px solid ${amber}0.35)`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: '3px 2px' }}>
-            {[...Array(5)].map((_, i) => (<div key={i} style={{ width: '100%', height: '1px', backgroundColor: `rgba(212,145,42,${0.3 + i * 0.1})` }} />))}
+          {/* TARS monolith */}
+          <div style={{ width: '10px', height: '36px', border: `1px solid ${amber}0.45)`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: '3px 2px', boxShadow: `0 0 12px ${amber}0.15)` }}>
+            {[...Array(5)].map((_, i) => (<div key={i} style={{ width: '100%', height: '1px', backgroundColor: `rgba(212,145,42,${0.3 + i * 0.12})` }} />))}
           </div>
           <div>
-            <div className="font-mono font-bold tracking-[0.35em] uppercase text-sm" style={{ color: `${amber}0.95)` }}>TARS</div>
-            <div className="font-mono text-[9px] tracking-[0.4em] uppercase" style={{ color: `${amber}0.3)` }}>Unit 01 · {location || 'Online'}</div>
+            <div className="font-mono font-bold tracking-[0.35em] uppercase" style={{ color: `${amber}1)`, fontSize: '15px', textShadow: `0 0 18px ${amber}0.4)` }}>TARS</div>
+            <div className="font-mono text-[9px] tracking-[0.4em] uppercase" style={{ color: `${blue}0.4)` }}>Unit 01 · {location || 'Online'}</div>
           </div>
-          <div className="hidden sm:block font-mono text-[10px] tracking-[0.25em] uppercase ml-2" style={{ color: 'rgba(255,255,255,0.1)' }}>Honesty 90% · Humor 75%</div>
+          <div className="hidden sm:flex items-center gap-1 ml-2">
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ color: `${amber}0.25)` }}>Humor 75%</span>
+            <span style={{ color: `${amber}0.12)` }}>·</span>
+            <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ color: `${amber}0.25)` }}>Honesty 90%</span>
+          </div>
         </div>
         <div className="flex items-center gap-4">
+          {/* TTS toggle */}
+          <button
+            onClick={() => { if (speaking) stopSpeaking(); setTtsEnabled(p => !p) }}
+            className="flex items-center gap-1.5 transition"
+            style={{ color: ttsEnabled ? `${amber}0.7)` : `${amber}0.25)` }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = `${amber}0.9)`)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = ttsEnabled ? `${amber}0.7)` : `${amber}0.25)`)}
+            title={ttsEnabled ? 'Mute TARS' : 'Unmute TARS'}
+          >
+            {ttsEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
+            {speaking && <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: `${amber}0.6)` }}>Speaking</span>}
+          </button>
           {messages.length > 0 && (
-            <button onClick={() => setMessages([])} className="flex items-center gap-1.5 transition" style={{ color: `${amber}0.25)` }} onMouseEnter={(e) => (e.currentTarget.style.color = `${amber}0.7)`)} onMouseLeave={(e) => (e.currentTarget.style.color = `${amber}0.25)`)}>
+            <button onClick={() => { stopSpeaking(); setMessages([]) }} className="flex items-center gap-1.5 transition" style={{ color: `${amber}0.25)` }} onMouseEnter={(e) => (e.currentTarget.style.color = `${amber}0.7)`)} onMouseLeave={(e) => (e.currentTarget.style.color = `${amber}0.25)`)}>
               <RotateCcw size={12} /><span className="text-[10px] uppercase tracking-widest font-mono">Clear</span>
             </button>
           )}
           <div className="flex items-center gap-2">
-            {userImage && (<img src={userImage} alt={userName} className="h-7 w-7 rounded-full" style={{ opacity: 0.5 }} />)}
+            {userImage && (<img src={userImage} alt={userName} className="h-7 w-7 rounded-full" style={{ opacity: 0.6, border: `1px solid ${amber}0.2)` }} />)}
             <button onClick={() => signOut({ callbackUrl: '/' })} className="transition" style={{ color: `${amber}0.25)` }} onMouseEnter={(e) => (e.currentTarget.style.color = `${amber}0.7)`)} onMouseLeave={(e) => (e.currentTarget.style.color = `${amber}0.25)`)} title="Sign out"><LogOut size={14} /></button>
           </div>
         </div>
       </header>
 
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-8">
-        <div className="mx-auto max-w-3xl flex flex-col gap-6">
+        <div className="mx-auto max-w-3xl flex flex-col gap-7">
           {isEmpty && !loading && (
             <div className="flex flex-col items-center justify-center py-20 text-center fade-up">
-              <div style={{ width: '28px', height: '64px', border: `1px solid ${amber}0.25)`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: '6px 3px', marginBottom: '32px', boxShadow: `0 0 24px ${amber}0.08)` }}>
-                {[...Array(8)].map((_, i) => (<div key={i} style={{ width: '100%', height: '1px', backgroundColor: `rgba(212,145,42,${0.12 + i * 0.05})` }} />))}
+              <div style={{ width: '32px', height: '76px', border: `1px solid ${amber}0.35)`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', padding: '8px 4px', marginBottom: '36px', boxShadow: `0 0 32px ${amber}0.12), 0 0 80px ${amber}0.05)` }}>
+                {[...Array(8)].map((_, i) => (<div key={i} style={{ width: '100%', height: '1px', backgroundColor: `rgba(212,145,42,${0.12 + i * 0.06})` }} />))}
               </div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.6em] mb-3" style={{ color: `${amber}0.4)` }}>Ready</p>
-              <p className="text-sm mb-10" style={{ color: 'rgba(255,255,255,0.22)', fontFamily: 'monospace' }}>What do you need?</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.6em] mb-3" style={{ color: `${amber}0.5)` }}>Ready</p>
+              <p className="text-base mb-10" style={{ color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' }}>What do you need, Cooper?</p>
               <div className="flex flex-wrap justify-center gap-2 max-w-lg">
                 {SUGGESTIONS.map((s) => (
-                  <button key={s} onClick={() => send(s)} className="px-4 py-2 text-xs transition font-mono" style={{ border: `1px solid ${amber}0.1)`, color: `${amber}0.4)`, borderRadius: '2px' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${amber}0.45)`; e.currentTarget.style.color = `${amber}0.9)`; e.currentTarget.style.background = `${amber}0.05)` }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${amber}0.1)`; e.currentTarget.style.color = `${amber}0.4)`; e.currentTarget.style.background = 'transparent' }}>{s}</button>
+                  <button key={s} onClick={() => send(s)} className="px-4 py-2 text-xs transition font-mono" style={{ border: `1px solid ${amber}0.12)`, color: `${amber}0.5)`, borderRadius: '2px' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = `${amber}0.5)`; e.currentTarget.style.color = `${amber}1)`; e.currentTarget.style.background = `${amber}0.06)` }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${amber}0.12)`; e.currentTarget.style.color = `${amber}0.5)`; e.currentTarget.style.background = 'transparent' }}>{s}</button>
                 ))}
               </div>
             </div>
@@ -182,14 +294,21 @@ export default function ChatInterface({ userName, userImage }: Props) {
 
           {messages.map((msg, i) => (
             <div key={i} className={`flex fade-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {msg.role === 'assistant' && (<span className="mr-3 mt-[14px] font-mono text-[11px] uppercase tracking-[0.2em] shrink-0 font-bold" style={{ color: `${amber}0.7)` }}>T</span>)}
-              <div className="max-w-[80%] flex flex-col gap-2">
-                {msg.imageUrl && (<img src={msg.imageUrl} alt="attached" className="rounded max-w-[280px] max-h-[200px] object-cover" style={{ border: `1px solid ${amber}0.2)` }} />)}
+              {msg.role === 'assistant' && (
+                <div className="mr-3 mt-[14px] shrink-0 flex flex-col items-center gap-[3px]">
+                  {[...Array(4)].map((_, j) => (<div key={j} style={{ width: '8px', height: '1px', backgroundColor: `rgba(212,145,42,${0.4 + j * 0.12})` }} />))}
+                </div>
+              )}
+              <div className="max-w-[82%] flex flex-col gap-2">
+                {msg.imageUrl && (<img src={msg.imageUrl} alt="attached" className="rounded max-w-[300px] max-h-[220px] object-cover" style={{ border: `1px solid ${amber}0.25)` }} />)}
                 {msg.content && (
-                  <div className="px-4 py-3 text-sm leading-[1.9] whitespace-pre-wrap font-mono"
-                    style={msg.role === 'user'
-                      ? { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)', borderRadius: '2px 12px 12px 12px' }
-                      : { background: `${amber}0.04)`, border: `1px solid ${amber}0.14)`, color: 'rgba(255,255,255,0.82)', borderRadius: '12px 12px 12px 2px' }}>
+                  <div className="px-5 py-4 leading-[1.85] whitespace-pre-wrap font-mono"
+                    style={{
+                      fontSize: '15px',
+                      ...(msg.role === 'user'
+                        ? { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.92)', borderRadius: '2px 14px 14px 14px' }
+                        : { background: `linear-gradient(135deg, ${amber}0.06), ${blue}0.03))`, border: `1px solid ${amber}0.2)`, color: 'rgba(255,255,255,0.95)', borderRadius: '14px 14px 14px 2px', boxShadow: `0 0 20px ${amber}0.05)` })
+                    }}>
                     {msg.content}
                   </div>
                 )}
@@ -199,9 +318,11 @@ export default function ChatInterface({ userName, userImage }: Props) {
 
           {loading && (
             <div className="flex justify-start fade-up">
-              <span className="mr-3 mt-[14px] font-mono text-[11px] uppercase tracking-[0.2em] shrink-0 font-bold" style={{ color: `${amber}0.7)` }}>T</span>
-              <div className="px-4 py-3 text-sm" style={{ background: `${amber}0.04)`, border: `1px solid ${amber}0.14)`, borderRadius: '12px 12px 12px 2px' }}>
-                <span className="font-mono text-xs uppercase tracking-widest" style={{ color: `${amber}0.6)` }}>{status}<span className="cursor-blink">_</span></span>
+              <div className="mr-3 mt-[14px] shrink-0 flex flex-col items-center gap-[3px]">
+                {[...Array(4)].map((_, j) => (<div key={j} style={{ width: '8px', height: '1px', backgroundColor: `rgba(212,145,42,${0.4 + j * 0.12})` }} />))}
+              </div>
+              <div className="px-5 py-4" style={{ background: `${amber}0.05)`, border: `1px solid ${amber}0.18)`, borderRadius: '14px 14px 14px 2px' }}>
+                <span className="font-mono text-xs uppercase tracking-widest" style={{ color: `${amber}0.7)`, fontSize: '13px' }}>{status}<span className="cursor-blink">_</span></span>
               </div>
             </div>
           )}
@@ -209,32 +330,63 @@ export default function ChatInterface({ userName, userImage }: Props) {
         </div>
       </div>
 
-      <div className="shrink-0 px-6 py-4" style={{ borderTop: `1px solid ${amber}0.1)` }}>
+      {/* Input bar */}
+      <div className="shrink-0 px-6 py-5" style={{ borderTop: `1px solid ${amber}0.12)`, background: 'rgba(0,8,20,0.75)', backdropFilter: 'blur(8px)' }}>
         {image && (
-          <div className="mx-auto max-w-3xl mb-2 flex items-center gap-2">
-            <img src={image.previewUrl} alt="preview" className="h-12 w-12 object-cover rounded" style={{ border: `1px solid ${amber}0.3)` }} />
-            <span className="font-mono text-xs" style={{ color: `${amber}0.5)` }}>Image attached</span>
-            <button onClick={() => setImage(null)} style={{ color: `${amber}0.4)` }} onMouseEnter={(e) => (e.currentTarget.style.color = `${amber}0.8)`)} onMouseLeave={(e) => (e.currentTarget.style.color = `${amber}0.4)`)}><X size={14} /></button>
+          <div className="mx-auto max-w-3xl mb-3 flex items-center gap-2">
+            <img src={image.previewUrl} alt="preview" className="h-14 w-14 object-cover rounded" style={{ border: `1px solid ${amber}0.35)` }} />
+            <span className="font-mono text-xs" style={{ color: `${amber}0.6)` }}>Image attached</span>
+            <button onClick={() => setImage(null)} style={{ color: `${amber}0.5)` }} onMouseEnter={(e) => (e.currentTarget.style.color = `${amber}0.9)`)} onMouseLeave={(e) => (e.currentTarget.style.color = `${amber}0.5)`)}><X size={14} /></button>
           </div>
         )}
-        <div className="mx-auto max-w-3xl flex items-end gap-2">
+        <div className="mx-auto max-w-3xl flex items-end gap-3">
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
-          <button onClick={() => fileInputRef.current?.click()} className="flex h-12 w-10 shrink-0 items-center justify-center transition" style={{ color: `${amber}0.35)` }} onMouseEnter={(e) => (e.currentTarget.style.color = `${amber}0.8)`)} onMouseLeave={(e) => (e.currentTarget.style.color = `${amber}0.35)`)} title="Attach image">
-            <Paperclip size={16} />
+          <button onClick={() => fileInputRef.current?.click()} className="flex h-14 w-10 shrink-0 items-center justify-center transition" style={{ color: `${amber}0.4)` }} onMouseEnter={(e) => (e.currentTarget.style.color = `${amber}0.9)`)} onMouseLeave={(e) => (e.currentTarget.style.color = `${amber}0.4)`)} title="Attach image">
+            <Paperclip size={17} />
           </button>
-          <textarea ref={textareaRef} value={input} onChange={(e) => { setInput(e.target.value); autoResize() }} onKeyDown={handleKey} placeholder="Speak to TARS…" rows={1} disabled={loading}
-            className="flex-1 resize-none px-4 py-3 text-sm outline-none transition disabled:opacity-40 font-mono"
-            style={{ background: `${amber}0.03)`, border: `1px solid ${amber}0.12)`, color: 'rgba(255,255,255,0.85)', minHeight: '48px', borderRadius: '2px' }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = `${amber}0.4)`)}
-            onBlur={(e) => (e.currentTarget.style.borderColor = `${amber}0.12)`)} />
-          <button onClick={toggleVoice} className="flex h-12 w-10 shrink-0 items-center justify-center transition" style={{ color: listening ? `${amber}1)` : `${amber}0.35)`, background: listening ? `${amber}0.1)` : 'transparent' }} onMouseEnter={(e) => { if (!listening) e.currentTarget.style.color = `${amber}0.8)` }} onMouseLeave={(e) => { if (!listening) e.currentTarget.style.color = `${amber}0.35)` }} title="Voice input">
-            {listening ? <MicOff size={16} /> : <Mic size={16} />}
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => { setInput(e.target.value); autoResize() }}
+            onKeyDown={handleKey}
+            placeholder="Speak to TARS…"
+            rows={2}
+            disabled={loading}
+            className="flex-1 resize-none px-5 py-4 outline-none transition disabled:opacity-40 font-mono"
+            style={{
+              background: `rgba(0,10,30,0.6)`,
+              border: `1px solid ${amber}0.15)`,
+              color: 'rgba(255,255,255,0.95)',
+              minHeight: '72px',
+              borderRadius: '4px',
+              fontSize: '15px',
+              lineHeight: '1.7',
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = `${amber}0.5)`)}
+            onBlur={(e) => (e.currentTarget.style.borderColor = `${amber}0.15)`)}
+          />
+          <button
+            onClick={toggleVoice}
+            className="flex h-14 w-10 shrink-0 items-center justify-center transition"
+            style={{ color: listening ? `${amber}1)` : `${amber}0.4)`, background: listening ? `${amber}0.12)` : 'transparent', borderRadius: '4px' }}
+            onMouseEnter={(e) => { if (!listening) e.currentTarget.style.color = `${amber}0.9)` }}
+            onMouseLeave={(e) => { if (!listening) e.currentTarget.style.color = `${amber}0.4)` }}
+            title="Voice input"
+          >
+            {listening ? <MicOff size={17} /> : <Mic size={17} />}
           </button>
-          <button onClick={() => send(input)} disabled={(!input.trim() && !image) || loading} className="flex h-12 w-12 shrink-0 items-center justify-center transition disabled:opacity-20 disabled:cursor-not-allowed" style={{ background: `${amber}0.9)`, border: `1px solid ${amber}0.6)`, borderRadius: '2px' }} onMouseEnter={(e) => { if (!loading) (e.currentTarget as HTMLElement).style.background = `${amber}1)` }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = `${amber}0.9)` }}>
-            <Send size={15} color="black" />
+          <button
+            onClick={() => send(input)}
+            disabled={(!input.trim() && !image) || loading}
+            className="flex h-14 w-14 shrink-0 items-center justify-center transition disabled:opacity-20 disabled:cursor-not-allowed"
+            style={{ background: `${amber}0.92)`, border: `1px solid ${amber}0.7)`, borderRadius: '4px', boxShadow: `0 0 16px ${amber}0.2)` }}
+            onMouseEnter={(e) => { if (!loading) (e.currentTarget as HTMLElement).style.background = `${amber}1)` }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = `${amber}0.92)` }}
+          >
+            <Send size={16} color="black" />
           </button>
         </div>
-        <p className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.3em]" style={{ color: `${amber}0.18)` }}>Enter to send · Shift+Enter for new line · 🎤 voice · 📎 image</p>
+        <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.3em]" style={{ color: `${amber}0.2)` }}>Enter to send · Shift+Enter new line · 🎤 voice · 📎 image · 🔊 TARS speaks</p>
       </div>
     </div>
   )
