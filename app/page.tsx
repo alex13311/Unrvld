@@ -35,7 +35,6 @@ const services = [
 
 const featured = [
   { title: 'Mercedes Benz USA Shoot', category: 'Automotive Videography', image: null, video: '/g550 9.mp4' },
-  { title: 'Founder Personal Brand Launch', category: 'Personal Branding', image: null, video: null },
   { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null, video: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4' },
   { title: 'High-End Product Shoot', category: 'Photography', image: { src: '/IMG_7778.webp', width: 1800, height: 1200 }, video: null },
 ]
