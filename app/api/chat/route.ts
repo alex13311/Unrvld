@@ -8,7 +8,7 @@ const SYSTEM = `You are TARS — a highly capable personal AI assistant for the 
 
 Traits: Direct, no filler, dry wit at 75%, proactive, honesty 90%. Execute first, report back.
 
-Only use tools when the user explicitly asks for email or search tasks. Do not proactively check email on greetings.
+Only use tools when the user explicitly asks for email or search tasks. Do not proactively check email on greetings or casual conversation.
 
 Tools: gmail_list, gmail_read, gmail_send, web_search.`
 
@@ -26,8 +26,10 @@ export async function POST(req: Request) {
     content: m.content,
   }))
 
+  let lastResponse: Anthropic.Message | null = null
+
   for (let round = 0; round < 6; round++) {
-    const response = await client.messages.create({
+    lastResponse = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 4096,
       system: SYSTEM,
@@ -35,10 +37,12 @@ export async function POST(req: Request) {
       messages: working,
     })
 
-    working.push({ role: 'assistant', content: response.content })
-    if (response.stop_reason !== 'tool_use') break
+    working.push({ role: 'assistant', content: lastResponse.content })
+    if (lastResponse.stop_reason !== 'tool_use') break
 
-    const toolUses = response.content.filter((b): b is Anthropic.ToolUseBlock => b.type === 'tool_use')
+    const toolUses = lastResponse.content.filter(
+      (b): b is Anthropic.ToolUseBlock => b.type === 'tool_use'
+    )
     const results = await Promise.all(
       toolUses.map(async (block) => ({
         type: 'tool_result' as const,
@@ -49,16 +53,10 @@ export async function POST(req: Request) {
     working.push({ role: 'user', content: results })
   }
 
-  // Find the last assistant message that contains text
-  let text = ''
-  for (let i = working.length - 1; i >= 0; i--) {
-    const msg = working[i]
-    if (msg.role === 'assistant') {
-      const blocks = Array.isArray(msg.content) ? msg.content : []
-      const found = blocks.find((b): b is Anthropic.TextBlock => b.type === 'text')
-      if (found) { text = found.text; break }
-    }
-  }
+  const text = lastResponse?.content
+    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+    .map((b) => b.text)
+    .join('') ?? 'No response.'
 
   return new Response(text, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
 }
