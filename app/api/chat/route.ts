@@ -8,9 +8,9 @@ const SYSTEM = `You are TARS — a highly capable personal AI assistant for the 
 
 Traits: Direct, no filler, dry wit at 75%, proactive, honesty 90%. Execute first, report back.
 
-Tools: gmail_list, gmail_read, gmail_send, web_search.
+Only use tools when the user explicitly asks for email or search tasks. Do not proactively check email on greetings.
 
-For emails: use gmail_list first, then gmail_read for full content. For sending: draft and send without asking. For research: use web_search and give a useful summary.`
+Tools: gmail_list, gmail_read, gmail_send, web_search.`
 
 type MessageParam = Anthropic.MessageParam
 
@@ -49,9 +49,16 @@ export async function POST(req: Request) {
     working.push({ role: 'user', content: results })
   }
 
-  const last = working[working.length - 1]
-  const content = Array.isArray(last.content) ? last.content : []
-  const text = content.find((b): b is Anthropic.TextBlock => b.type === 'text')?.text ?? ''
+  // Find the last assistant message that contains text
+  let text = ''
+  for (let i = working.length - 1; i >= 0; i--) {
+    const msg = working[i]
+    if (msg.role === 'assistant') {
+      const blocks = Array.isArray(msg.content) ? msg.content : []
+      const found = blocks.find((b): b is Anthropic.TextBlock => b.type === 'text')
+      if (found) { text = found.text; break }
+    }
+  }
 
   return new Response(text, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
 }
