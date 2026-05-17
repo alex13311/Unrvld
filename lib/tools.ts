@@ -24,15 +24,20 @@ export const TARS_TOOLS: Anthropic.Tool[] = [
   },
 ]
 
-export async function executeTool(name: string, input: Record<string, unknown>, accessToken: string): Promise<string> {
+export async function executeTool(name: string, input: Record<string, unknown>, accessToken: string | undefined): Promise<string> {
   try {
     switch (name) {
       case 'gmail_list': {
+        if (!accessToken) return 'Gmail not connected. Sign out and sign back in to grant Gmail access.'
         const emails = await listEmails(accessToken, (input.query as string) ?? '', (input.max_results as number) ?? 8)
         return emails.length ? JSON.stringify(emails, null, 2) : 'No emails found.'
       }
-      case 'gmail_read': return JSON.stringify(await readEmail(accessToken, input.message_id as string), null, 2)
+      case 'gmail_read': {
+        if (!accessToken) return 'Gmail not connected. Sign out and sign back in to grant Gmail access.'
+        return JSON.stringify(await readEmail(accessToken, input.message_id as string), null, 2)
+      }
       case 'gmail_send': {
+        if (!accessToken) return 'Gmail not connected. Sign out and sign back in to grant Gmail access.'
         const r = await sendEmail(accessToken, input.to as string, input.subject as string, input.body as string)
         return r.success ? `Email sent to ${input.to}.` : 'Failed to send.'
       }

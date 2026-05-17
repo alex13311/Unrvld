@@ -16,9 +16,10 @@ type MessageParam = Anthropic.MessageParam
 
 export async function POST(req: Request) {
   const session = await auth()
-  if (!session?.accessToken) return new Response('Unauthorized', { status: 401 })
+  if (!session) return new Response('Unauthorized', { status: 401 })
 
   const { messages } = await req.json()
+  const accessToken = session.accessToken as string | undefined
 
   const working: MessageParam[] = messages.map((m: { role: string; content: string }) => ({
     role: m.role as 'user' | 'assistant',
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
       toolUses.map(async (block) => ({
         type: 'tool_result' as const,
         tool_use_id: block.id,
-        content: await executeTool(block.name, block.input as Record<string, unknown>, session.accessToken!),
+        content: await executeTool(block.name, block.input as Record<string, unknown>, accessToken),
       }))
     )
     working.push({ role: 'user', content: results })
