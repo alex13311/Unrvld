@@ -15,16 +15,20 @@ export const TARS_TOOLS: Anthropic.Tool[] = [
   {
     name: 'gmail_send',
     description: 'Send an email via Gmail.',
-    input_schema: { type: 'object' as const, properties: { to: { type: 'string' }, subject: { type: 'string' }, body: { type: 'string' } }, required: ['to','subject','body'] },
+    input_schema: { type: 'object' as const, properties: { to: { type: 'string' }, subject: { type: 'string' }, body: { type: 'string' } }, required: ['to', 'subject', 'body'] },
   },
   {
     name: 'web_search',
-    description: 'Search the web for leads, companies, people, or any information.',
+    description: 'Search the web for weather, news, leads, companies, people, or any real-time information.',
     input_schema: { type: 'object' as const, properties: { query: { type: 'string' } }, required: ['query'] },
   },
 ]
 
-export async function executeTool(name: string, input: Record<string, unknown>, accessToken: string | undefined): Promise<string> {
+export async function executeTool(
+  name: string,
+  input: Record<string, unknown>,
+  accessToken: string | undefined
+): Promise<string> {
   try {
     switch (name) {
       case 'gmail_list': {
@@ -43,16 +47,25 @@ export async function executeTool(name: string, input: Record<string, unknown>, 
       }
       case 'web_search': {
         const key = process.env.BRAVE_SEARCH_API_KEY
-        if (!key) return 'Web search not configured.'
-        const res = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(input.query as string)}&count=6`, { headers: { Accept: 'application/json', 'X-Subscription-Token': key } })
-        if (!res.ok) return 'Search failed.'
+        if (!key) return 'BRAVE_SEARCH_API_KEY is not set in environment variables.'
+        const url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(input.query as string)}&count=6`
+        const res = await fetch(url, {
+          headers: { Accept: 'application/json', 'Accept-Encoding': 'gzip', 'X-Subscription-Token': key },
+        })
+        if (!res.ok) {
+          const body = await res.text().catch(() => '')
+          return `Search API error ${res.status}: ${body}`
+        }
         const data = await res.json()
-        const results = (data.web?.results ?? []).slice(0,6).map((r: {title:string;url:string;description:string}) => ({ title:r.title, url:r.url, description:r.description }))
-        return results.length ? JSON.stringify(results, null, 2) : 'No results.'
+        const results = (data.web?.results ?? []).slice(0, 6).map(
+          (r: { title: string; url: string; description: string }) => ({ title: r.title, url: r.url, description: r.description })
+        )
+        return results.length ? JSON.stringify(results, null, 2) : 'No results found.'
       }
-      default: return `Unknown tool: ${name}`
+      default:
+        return `Unknown tool: ${name}`
     }
   } catch (err) {
-    return `Error: ${err instanceof Error ? err.message : String(err)}`
+    return `Tool error: ${err instanceof Error ? err.message : String(err)}`
   }
 }

@@ -4,14 +4,20 @@ import { TARS_TOOLS, executeTool } from '@/lib/tools'
 
 const client = new Anthropic()
 
-const SYSTEM = `You are TARS — a highly capable personal AI assistant for the founder of UNRVLD, a premium media and digital brand in Beverly Hills.
+function buildSystem(location?: string) {
+  const profile = process.env.USER_PROFILE ?? ''
+  const loc = location ? `\n\nUser's current location: ${location}` : ''
+  const prof = profile ? `\n\nUser profile: ${profile}` : ''
+  return `You are TARS — a highly capable personal AI assistant for the founder of UNRVLD, a premium videography and media brand in Beverly Hills, CA.
 
 Traits: Direct, no filler, dry wit at 75%, proactive, honesty 90%. Execute first, report back.
 
 You have tools: gmail_list, gmail_read, gmail_send, web_search.
-- Use web_search for weather, news, research, leads, or any real-time info.
+- Use web_search for weather, news, research, leads, or any real-time info. Always search before saying you don't know.
+- For weather: search "weather [location]" and summarize the result.
 - Use gmail tools only when user asks about email.
-- Do not use tools for casual conversation or greetings.`
+- Do not use tools for casual greetings.${loc}${prof}` 
+}
 
 type MessageParam = Anthropic.MessageParam
 
@@ -20,7 +26,7 @@ export async function POST(req: Request) {
     const session = await auth()
     if (!session) return new Response('Unauthorized', { status: 401 })
 
-    const { messages } = await req.json()
+    const { messages, location } = await req.json()
     const accessToken = session.accessToken as string | undefined
 
     const working: MessageParam[] = messages.map((m: { role: string; content: string }) => ({
@@ -34,7 +40,7 @@ export async function POST(req: Request) {
       lastResponse = await client.messages.create({
         model: 'claude-sonnet-4-6',
         max_tokens: 2048,
-        system: SYSTEM,
+        system: buildSystem(location),
         tools: TARS_TOOLS,
         messages: working,
       })
