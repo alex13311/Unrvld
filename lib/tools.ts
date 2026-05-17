@@ -1,10 +1,17 @@
 import type Anthropic from '@anthropic-ai/sdk'
 import { listEmails, readEmail, sendEmail } from './gmail'
 
+const WMO_CODES: Record<number, string> = {
+  0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
+  45: 'Foggy', 48: 'Icy fog', 51: 'Light drizzle', 53: 'Drizzle', 55: 'Heavy drizzle',
+  61: 'Light rain', 63: 'Rain', 65: 'Heavy rain', 71: 'Light snow', 73: 'Snow', 75: 'Heavy snow',
+  80: 'Rain showers', 81: 'Heavy showers', 82: 'Violent showers', 95: 'Thunderstorm',
+}
+
 export const TARS_TOOLS: Anthropic.Tool[] = [
   {
     name: 'get_weather',
-    description: 'Get current weather for any location.',
+    description: 'Get current weather and forecast for any location.',
     input_schema: { type: 'object' as const, properties: { location: { type: 'string' } }, required: ['location'] },
   },
   {
@@ -14,7 +21,7 @@ export const TARS_TOOLS: Anthropic.Tool[] = [
   },
   {
     name: 'gmail_list',
-    description: 'List emails from Gmail. Use a Gmail search query to filter.',
+    description: 'List emails from Gmail.',
     input_schema: { type: 'object' as const, properties: { query: { type: 'string' }, max_results: { type: 'number' } } },
   },
   {
@@ -37,41 +44,60 @@ export async function executeTool(
   try {
     switch (name) {
       case 'get_weather': {
-        const loc = encodeURIComponent(input.location as string)
-        const res = await fetch(`https://wttr.in/${loc}?format=j1`, {
-          headers: { 'User-Agent': 'TARS-AI/1.0' },
-        })
-        if (!res.ok) return `Weather fetch failed: ${res.status}`
-        const data = await res.json()
-        const cur = data.current_condition?.[0]
-        if (!cur) return 'No weather data returned.'
+        const location = input.location as string
+        // Geocode location
+        const geoRes = await fetch(
+          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=en&format=json`
+        )
+        const geoData = await geoRes.json()
+        const place = geoData.results?.[0]
+        if (!place) return `Could not find location: ${location}`
+
+        const { latitude, longitude, name: placeName, admin1, country } = place
+
+        // Fetch weather
+        const wxRes = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}` +
+          `&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,precipitation` +
+          `&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum` +
+          `&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&forecast_days=3&timezone=auto`
+        )
+        const wx = await wxRes.json()
+        const c = wx.current
+        const d = wx.daily
+
         return JSON.stringify({
-          condition: cur.weatherDesc?.[0]?.value,
-          temp_f: cur.temp_F,
-          temp_c: cur.temp_C,
-          feels_like_f: cur.FeelsLikeF,
-          humidity: cur.humidity + '%',
-          wind_mph: cur.windspeedMiles + ' mph',
-          visibility: cur.visibility + ' miles',
-        })
+          location: `${placeName}, ${admin1}, ${country}`,
+          condition: WMO_CODES[c.weather_code] ?? `Code ${c.weather_code}`,
+          temp_f: Math.round(c.temperature_2m),
+          feels_like_f: Math.round(c.apparent_temperature),
+          humidity: c.relative_humidity_2m + '%',
+          wind_mph: Math.round(c.wind_speed_10m),
+          precip_in: c.precipitation,
+          forecast: d.time?.map((date: string, i: number) => ({
+            date,
+            condition: WMO_CODES[d.weather_code[i]] ?? `Code ${d.weather_code[i]}`,
+            high_f: Math.round(d.temperature_2m_max[i]),
+            low_f: Math.round(d.temperature_2m_min[i]),
+            precip_in: d.precipitation_sum[i],
+          })),
+        }, null, 2)
       }
 
       case 'web_search': {
         const key = process.env.BRAVE_SEARCH_API_KEY
         if (!key) return 'BRAVE_SEARCH_API_KEY is not set.'
-        const url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(input.query as string)}&count=6`
-        const res = await fetch(url, {
-          headers: { Accept: 'application/json', 'X-Subscription-Token': key },
-        })
+        const res = await fetch(
+          `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(input.query as string)}&count=6`,
+          { headers: { Accept: 'application/json', 'X-Subscription-Token': key } }
+        )
         if (!res.ok) {
           const body = await res.text().catch(() => '')
           return `Search API error ${res.status}: ${body}`
         }
         const data = await res.json()
         const results = (data.web?.results ?? []).slice(0, 6).map(
-          (r: { title: string; url: string; description: string }) => ({
-            title: r.title, url: r.url, description: r.description,
-          })
+          (r: { title: string; url: string; description: string }) => ({ title: r.title, url: r.url, description: r.description })
         )
         return results.length ? JSON.stringify(results, null, 2) : 'No results found.'
       }
