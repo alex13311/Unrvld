@@ -34,11 +34,9 @@ const services = [
 ]
 
 const featured = [
-  { title: 'Mercedes Benz USA Shoot', category: 'Automotive Videography', image: null, video: '/g550 9.mp4' },
-  { title: 'Mercedes Benz USA Shoot', category: 'Automotive Videography', image: null, video: '/g51.mp4' },
-  { title: 'Mercedes Benz USA Shoot', category: 'Automotive Videography', image: null, video: '/g52.mp4' },
-  { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null, video: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4' },
-  { title: 'High-End Product Shoot', category: 'Photography', image: { src: '/IMG_7778.webp', width: 1800, height: 1200 }, video: null },
+  { title: 'Mercedes Benz USA Shoot', category: 'Automotive Videography', image: null, video: '/g550 9.mp4', href: '/work#mercedes-benz-usa-shoot' },
+  { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null, video: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4', href: '/work' },
+  { title: 'High-End Product Shoot', category: 'Photography', image: { src: '/IMG_7778.webp', width: 1800, height: 1200 }, video: null, href: '/work' },
 ]
 
 export default function HomePage() {
@@ -154,7 +152,7 @@ export default function HomePage() {
             {featured.map((item, i) => (
               <Link
                 key={i}
-                href="/work"
+                href={item.href}
                 className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] transition hover:border-white/20"
               >
                 {item.video ? (

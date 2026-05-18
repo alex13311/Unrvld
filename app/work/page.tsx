@@ -76,7 +76,7 @@ export default function WorkPage() {
 
           <div className="space-y-20">
             {videographySections.map((section) => (
-              <div key={section.title}>
+              <div key={section.title} id={section.title.toLowerCase().replace(/\s+/g, '-')}>
                 <div className="mb-8 border-t border-white/10 pt-8">
                   <h3 className="text-xl font-medium">{section.title}</h3>
                   <p className="mt-2 max-w-lg text-sm leading-6 text-white/45">
