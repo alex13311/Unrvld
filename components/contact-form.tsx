@@ -54,10 +54,18 @@ export default function ContactForm() {
 
   const onSubmit = async (data: FormValues) => {
     setError(false)
-    const res = await fetch('/api/contact', {
+    const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        access_key: 'ed2be87e-27a6-4304-a90d-a3b5cbb0b22f',
+        name: data.name,
+        email: data.email,
+        service: data.service,
+        budget: data.budget ?? 'Not provided',
+        message: data.message,
+        subject: `New Inquiry — ${data.name}`,
+      }),
     })
     if (res.ok) {
       setSubmitted(true)
