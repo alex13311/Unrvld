@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const videographySections = [
   {
-    title: 'Premium Automotive',
+    title: 'Premium Automotive Reels',
     tagline: 'Cinematic car content engineered to generate leads and stop the scroll.',
     videos: [
       { mobileSrc: '/Diablo UNRVLD (1).mp4', desktopSrc: '/Diablo UNRVLD (1).mp4' },
