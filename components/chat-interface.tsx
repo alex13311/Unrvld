@@ -91,6 +91,63 @@ export default function ChatInterface({ userName, userImage }: Props) {
     el.style.height = Math.min(el.scrollHeight, 200) + 'px'
   }, [])
 
+  function makeTarsAudioChain(ctx: AudioContext, source: AudioBufferSourceNode) {
+    // Slight pitch drop — TARS is deep and measured
+    source.playbackRate.value = 0.93
+
+    // High-pass: cut muddy sub-bass below 90Hz
+    const hpf = ctx.createBiquadFilter()
+    hpf.type = 'highpass'
+    hpf.frequency.value = 90
+    hpf.Q.value = 0.7
+
+    // Presence boost around 2kHz — cuts through, adds mechanical clarity
+    const presence = ctx.createBiquadFilter()
+    presence.type = 'peaking'
+    presence.frequency.value = 2000
+    presence.gain.value = 4
+    presence.Q.value = 1.2
+
+    // Slight air cut above 8kHz — less human, more synthetic
+    const lpf = ctx.createBiquadFilter()
+    lpf.type = 'lowpass'
+    lpf.frequency.value = 8000
+    lpf.Q.value = 0.5
+
+    // Subtle ring modulation — the metallic "machine" quality
+    const ringCarrier = ctx.createOscillator()
+    ringCarrier.frequency.value = 28
+    ringCarrier.type = 'sine'
+    const ringGain = ctx.createGain()
+    ringGain.gain.value = 0
+    ringCarrier.connect(ringGain.gain)
+    ringCarrier.start()
+
+    // Very light saturation for that processed-audio edge
+    const distortion = ctx.createWaveShaper()
+    const curve = new Float32Array(256)
+    for (let i = 0; i < 256; i++) {
+      const x = (i * 2) / 256 - 1
+      curve[i] = ((Math.PI + 12) * x) / (Math.PI + 12 * Math.abs(x))
+    }
+    distortion.curve = curve
+    distortion.oversample = '4x'
+
+    // Master gain
+    const master = ctx.createGain()
+    master.gain.value = 1.1
+
+    source.connect(hpf)
+    hpf.connect(presence)
+    presence.connect(lpf)
+    lpf.connect(ringGain)
+    ringGain.connect(distortion)
+    distortion.connect(master)
+    master.connect(ctx.destination)
+
+    return { ringCarrier, master }
+  }
+
   async function speak(text: string) {
     if (!ttsEnabled) return
     stopSpeaking()
@@ -104,17 +161,20 @@ export default function ChatInterface({ userName, userImage }: Props) {
         body: JSON.stringify({ text: clean }),
       })
       if (res.status === 503 || !res.ok) {
-        // ElevenLabs not configured — fall back to browser TTS
         browserSpeak(clean)
         return
       }
       const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const audio = new Audio(url)
-      audioRef.current = audio
-      audio.onended = () => { setSpeaking(false); URL.revokeObjectURL(url) }
-      audio.onerror = () => { setSpeaking(false); URL.revokeObjectURL(url) }
-      await audio.play()
+      const arrayBuffer = await blob.arrayBuffer()
+      const ctx = new AudioContext()
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
+      const source = ctx.createBufferSource()
+      source.buffer = audioBuffer
+      const { ringCarrier } = makeTarsAudioChain(ctx, source)
+      source.onended = () => { ringCarrier.stop(); ctx.close(); setSpeaking(false) }
+      source.start()
+      // store a stop handle
+      audioRef.current = { pause: () => { try { source.stop(); ringCarrier.stop(); ctx.close() } catch { /* already stopped */ } }, src: '' } as unknown as HTMLAudioElement
     } catch {
       browserSpeak(clean)
     }
