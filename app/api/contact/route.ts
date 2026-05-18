@@ -21,13 +21,7 @@ export async function POST(req: Request) {
     'not-sure': 'Not Sure Yet',
   }
 
-  try {
-    await resend.emails.send({
-      from: 'UNRVLD Inquiries <onboarding@resend.dev>',
-      to: ['unrvldllc@gmail.com'],
-      replyTo: email,
-      subject: `New Inquiry from ${name} — ${serviceLabels[service] ?? service}`,
-      text: `
+  const body = `
 New inquiry from unrvldgroup.com
 
 Name: ${name}
@@ -37,8 +31,34 @@ Budget: ${budget ? budgetLabels[budget] ?? budget : 'Not provided'}
 
 Message:
 ${message}
-      `.trim(),
+  `.trim()
+
+  try {
+    // Send full email to Gmail
+    await resend.emails.send({
+      from: 'UNRVLD Inquiries <onboarding@resend.dev>',
+      to: ['unrvldllc@gmail.com'],
+      replyTo: email,
+      subject: `New Inquiry — ${name} (${serviceLabels[service] ?? service})`,
+      text: body,
     })
+
+    // Send SMS via email-to-text gateways (AT&T + T-Mobile — one will match your carrier)
+    const smsText = `UNRVLD inquiry from ${name}: ${email} — ${serviceLabels[service] ?? service}`
+    await Promise.allSettled([
+      resend.emails.send({
+        from: 'UNRVLD Inquiries <onboarding@resend.dev>',
+        to: ['4242792607@txt.att.net'],
+        subject: '',
+        text: smsText,
+      }),
+      resend.emails.send({
+        from: 'UNRVLD Inquiries <onboarding@resend.dev>',
+        to: ['4242792607@tmomail.net'],
+        subject: '',
+        text: smsText,
+      }),
+    ])
 
     return NextResponse.json({ success: true })
   } catch {
