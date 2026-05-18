@@ -1,8 +1,7 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
-  const resend = new Resend(process.env.RESEND_API_KEY)
   const { name, email, service, budget, message } = await req.json()
 
   const serviceLabels: Record<string, string> = {
@@ -21,6 +20,14 @@ export async function POST(req: Request) {
     'not-sure': 'Not Sure Yet',
   }
 
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'unrvldllc@gmail.com',
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  })
+
   const body = `
 New inquiry from unrvldgroup.com
 
@@ -34,34 +41,17 @@ ${message}
   `.trim()
 
   try {
-    // Send full email to Gmail
-    await resend.emails.send({
-      from: 'UNRVLD Inquiries <onboarding@resend.dev>',
-      to: ['unrvldllc@gmail.com'],
+    await transporter.sendMail({
+      from: 'UNRVLD Site <unrvldllc@gmail.com>',
+      to: 'unrvldllc@gmail.com',
       replyTo: email,
       subject: `New Inquiry — ${name} (${serviceLabels[service] ?? service})`,
       text: body,
     })
 
-    // Send SMS via email-to-text gateways (AT&T + T-Mobile — one will match your carrier)
-    const smsText = `UNRVLD inquiry from ${name}: ${email} — ${serviceLabels[service] ?? service}`
-    await Promise.allSettled([
-      resend.emails.send({
-        from: 'UNRVLD Inquiries <onboarding@resend.dev>',
-        to: ['4242792607@txt.att.net'],
-        subject: '',
-        text: smsText,
-      }),
-      resend.emails.send({
-        from: 'UNRVLD Inquiries <onboarding@resend.dev>',
-        to: ['4242792607@tmomail.net'],
-        subject: '',
-        text: smsText,
-      }),
-    ])
-
     return NextResponse.json({ success: true })
-  } catch {
+  } catch (err) {
+    console.error('Email error:', err)
     return NextResponse.json({ success: false }, { status: 500 })
   }
 }
