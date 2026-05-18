@@ -12,9 +12,9 @@ const videographySections = [
     title: 'Premium Automotive',
     tagline: 'Cinematic car content engineered to generate leads and stop the scroll.',
     videos: [
-      { mobileSrc: '/Diablo UNRVLD (1).mp4', desktopSrc: null },
-      { mobileSrc: '/copy_198A9F6B-1AE5-4ECF-81BE-38850451BF73 (1).mov', desktopSrc: null },
-      { mobileSrc: '/iceman 2 (1).mp4', desktopSrc: null },
+      { mobileSrc: '/Diablo UNRVLD (1).mp4', desktopSrc: '/Diablo UNRVLD (1).mp4' },
+      { mobileSrc: '/copy_198A9F6B-1AE5-4ECF-81BE-38850451BF73 (1).mov', desktopSrc: '/copy_198A9F6B-1AE5-4ECF-81BE-38850451BF73 (1).mov' },
+      { mobileSrc: '/iceman 2 (1).mp4', desktopSrc: '/iceman 2 (1).mp4' },
     ],
   },
   {
@@ -105,7 +105,7 @@ export default function WorkPage() {
                         )}
                         {/* Desktop */}
                         {video.desktopSrc ? (
-                          <div className="relative hidden aspect-video w-full overflow-hidden md:block">
+                          <div className={`relative hidden w-full overflow-hidden md:block ${section.landscape ? 'aspect-video' : 'aspect-[9/16]'}`}>
                             <video
                               src={video.desktopSrc}
                               autoPlay muted loop playsInline preload="auto"
@@ -114,7 +114,7 @@ export default function WorkPage() {
                             />
                           </div>
                         ) : (
-                          <div className="hidden md:flex aspect-video items-center justify-center">
+                          <div className={`hidden md:flex items-center justify-center ${section.landscape ? 'aspect-video' : 'aspect-[9/16]'}`}>
                             <p className="text-xs uppercase tracking-[0.25em] text-white/20">Coming Soon</p>
                           </div>
                         )}
