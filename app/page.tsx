@@ -3,10 +3,10 @@ import Image from 'next/image'
 import HeroVideo from '@/components/hero-video'
 
 const capabilities = [
-  'Videography',
-  'Photography',
-  'Brand Strategy',
-  'AI Systems',
+  { number: '01', label: 'Videography' },
+  { number: '02', label: 'Photography' },
+  { number: '03', label: 'Brand Strategy' },
+  { number: '04', label: 'AI Systems' },
 ]
 
 const services = [
@@ -41,10 +41,10 @@ const services = [
 ]
 
 const featured = [
-  { title: 'Premium Automotive Reels', category: 'Automotive Videography', image: null, video: '/Reels homepage2.mp4', href: '/work#premium-automotive-reels' },
-  { title: 'Mercedes Benz USA Shoot', category: 'Automotive Videography', image: null, video: '/g550 9.mp4', href: '/work#mercedes-benz-usa-shoot' },
-  { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null, video: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4', href: '/work' },
-  { title: 'High-End Product Shoot', category: 'Photography', image: { src: '/IMG_7778.webp', width: 1800, height: 1200 }, video: null, href: '/work' },
+  { title: 'Premium Automotive Reels', category: 'Automotive Videography', image: null, video: '/Reels homepage2.mp4', href: '/work#premium-automotive-reels', wide: true },
+  { title: 'Mercedes Benz USA Shoot', category: 'Automotive Videography', image: null, video: '/g550 9.mp4', href: '/work#mercedes-benz-usa-shoot', wide: false },
+  { title: 'Premium Brand Campaign', category: 'Commercial Film', image: null, video: '/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4', href: '/work', wide: false },
+  { title: 'High-End Product Shoot', category: 'Photography', image: { src: '/IMG_7778.webp', width: 1800, height: 1200 }, video: null, href: '/work', wide: true },
 ]
 
 export default function HomePage() {
@@ -56,11 +56,9 @@ export default function HomePage() {
           desktopSrc="/copy_D63E6BF3-0FEF-4704-8DD2-1E5821AF1126.mp4"
           mobileSrc="/UNRVLD BACKROUND (1).mp4"
         />
-        {/* Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.4)_50%,rgba(0,0,0,0.2)_100%)]" />
 
-        {/* Content */}
-        <div className="relative w-full px-6 pb-20 pt-40">
+        <div className="relative w-full px-6 pb-16 pt-40">
           <div className="mx-auto max-w-7xl">
             <p className="mb-8 text-xs uppercase tracking-[0.4em] text-white/50">
               <span className="text-red-500/80">Beverly Hills</span> // Digital
@@ -91,20 +89,30 @@ export default function HomePage() {
                 Start Project
               </Link>
             </div>
+
+            {/* Micro stats */}
+            <div className="mt-14 flex flex-wrap gap-x-8 gap-y-2 border-t border-white/10 pt-8">
+              {['Beverly Hills, CA', '24–48h Response', 'Premium Clients Only'].map((stat) => (
+                <span key={stat} className="text-[11px] uppercase tracking-[0.3em] text-white/25">
+                  {stat}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Capability Strip */}
-      <section className="border-y border-white/10 py-6">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-6">
+      <section className="border-y border-white/10 py-5">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-3 px-6">
           {capabilities.map((cap, i) => (
-            <span key={cap} className="flex items-center gap-8">
-              <span className="text-[11px] uppercase tracking-[0.3em] text-white/35">
-                {cap}
+            <span key={cap.label} className="flex items-center gap-10">
+              <span className="flex items-baseline gap-2">
+                <span className="text-[9px] tabular-nums text-red-500/60">{cap.number}</span>
+                <span className="text-[11px] uppercase tracking-[0.3em] text-white/35">{cap.label}</span>
               </span>
               {i < capabilities.length - 1 && (
-                <span className="text-red-700/40">·</span>
+                <span className="text-red-700/30">·</span>
               )}
             </span>
           ))}
@@ -114,16 +122,17 @@ export default function HomePage() {
       {/* Services */}
       <section className="px-6 py-24 md:py-32">
         <div className="mx-auto max-w-7xl">
-          <p className="mb-14 text-xs uppercase tracking-[0.4em] text-white/35">
-            What We Do
-          </p>
+          <div className="mb-14 flex items-center justify-between">
+            <p className="text-xs uppercase tracking-[0.4em] text-white/35">What We Do</p>
+            <p className="text-xs tabular-nums tracking-[0.2em] text-white/20">04 Services</p>
+          </div>
 
           <div className="grid gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] sm:grid-cols-2 lg:grid-cols-4">
             {services.map((s) => (
               <div key={s.number} className="bg-black p-8 md:p-10">
                 <div className="mb-6 h-px w-8 bg-red-600" />
-                <p className="text-xs text-white/25">{s.number}</p>
-                <h3 className="mt-5 text-2xl font-medium md:text-3xl">{s.title}</h3>
+                <p className="text-xs tabular-nums text-white/20">{s.number}</p>
+                <h3 className="mt-5 text-xl font-medium md:text-2xl">{s.title}</h3>
                 <p className="mt-5 text-sm leading-7 text-white/55">{s.body}</p>
                 <Link
                   href={s.href}
@@ -137,61 +146,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* AI Systems Highlight */}
-      <section className="px-6 pb-24 md:pb-32">
-        <div className="mx-auto max-w-7xl">
-          <div className="relative overflow-hidden rounded-3xl border border-red-900/40 bg-[linear-gradient(135deg,rgba(120,10,30,0.20)_0%,rgba(0,0,0,0.6)_55%,rgba(140,15,35,0.14)_100%)] p-10 md:p-16">
-            <div className="pointer-events-none absolute -right-32 -top-32 size-72 rounded-full bg-red-700/20 blur-3xl" />
-            <div className="pointer-events-none absolute -left-24 -bottom-24 size-64 rounded-full bg-red-900/20 blur-3xl" />
-
-            <p className="mb-6 text-xs uppercase tracking-[0.4em] text-red-500">
-              Now Building // AI Systems
-            </p>
-            <h2 className="max-w-3xl text-3xl font-medium leading-tight md:text-5xl">
-              AI Websites & Custom Agents.
-              <br />
-              <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
-                Unrivaled
-              </span>{' '}
-              execution.
-            </h2>
-            <p className="mt-7 max-w-2xl text-base leading-7 text-white/60 md:text-lg">
-              We build AI-powered websites in days — not weeks — and deploy custom agents
-              that qualify leads, book calls, and answer prospects on autopilot. Trained on
-              your brand, your voice, your offer.
-            </p>
-
-            <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] md:grid-cols-2">
-              <div className="bg-black/80 p-7">
-                <div className="mb-4 h-px w-8 bg-red-600" />
-                <h3 className="font-medium">AI-Built Websites</h3>
-                <p className="mt-3 text-sm leading-7 text-white/55">
-                  Custom premium sites delivered in days. Modern stack, top-tier
-                  performance, fully yours to own.
-                </p>
-              </div>
-              <div className="bg-black/80 p-7">
-                <div className="mb-4 h-px w-8 bg-red-600" />
-                <h3 className="font-medium">Custom AI Agents</h3>
-                <p className="mt-3 text-sm leading-7 text-white/55">
-                  Brand-trained agents for lead qualification, booking, and
-                  always-on client conversations.
-                </p>
-              </div>
-            </div>
-
-            <Link
-              href="/contact"
-              className="mt-10 inline-flex rounded-full bg-red-700 px-7 py-3 text-xs font-medium uppercase tracking-[0.2em] text-white transition hover:bg-red-600"
-            >
-              Build With AI
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Portfolio Teaser */}
-      <section className="px-6 pb-24 md:pb-32">
+      {/* Portfolio Teaser — asymmetric 3-col grid */}
+      <section className="border-t border-white/10 px-6 pb-24 pt-0 md:pb-32">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 flex items-end justify-between gap-6">
             <div>
@@ -213,29 +169,29 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             {featured.map((item, i) => (
               <Link
                 key={i}
                 href={item.href}
-                className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] transition hover:border-red-900/50"
+                className={`group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-red-900/50 ${item.wide ? 'md:col-span-2' : ''}`}
               >
                 {item.video ? (
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    <video src={item.video} autoPlay muted loop playsInline preload="auto" style={{ pointerEvents: 'none' }} className="h-full w-full object-cover transition group-hover:opacity-90" />
+                  <div className={`relative overflow-hidden ${item.wide ? 'aspect-[16/10]' : 'aspect-[4/3]'}`}>
+                    <video src={item.video} autoPlay muted loop playsInline preload="auto" style={{ pointerEvents: 'none' }} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] group-hover:opacity-90" />
                   </div>
                 ) : item.image ? (
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    <Image src={item.image.src} alt={item.title} fill className="object-cover transition group-hover:opacity-90" />
+                  <div className={`relative overflow-hidden ${item.wide ? 'aspect-[16/10]' : 'aspect-[4/3]'}`}>
+                    <Image src={item.image.src} alt={item.title} fill className="object-cover transition duration-500 group-hover:scale-[1.02] group-hover:opacity-90" />
                   </div>
                 ) : (
-                  <div className="aspect-[16/10] bg-[linear-gradient(135deg,rgba(90,0,0,0.3),rgba(255,255,255,0.02),rgba(0,0,0,0.7))] transition group-hover:opacity-90" />
+                  <div className={`${item.wide ? 'aspect-[16/10]' : 'aspect-[4/3]'} bg-[linear-gradient(135deg,rgba(90,0,0,0.3),rgba(255,255,255,0.02),rgba(0,0,0,0.7))]`} />
                 )}
-                <div className="p-6">
-                  <p className="text-[11px] uppercase tracking-[0.3em] text-white/35">
+                <div className="p-5">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-white/30">
                     {item.category}
                   </p>
-                  <h3 className="mt-2 text-xl font-medium transition group-hover:text-white/80">
+                  <h3 className="mt-1.5 text-base font-medium transition group-hover:text-white/80">
                     {item.title}
                   </h3>
                 </div>
@@ -243,7 +199,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="mt-8 text-center md:hidden">
+          <div className="mt-6 text-center md:hidden">
             <Link
               href="/work"
               className="text-xs uppercase tracking-[0.25em] text-white/45 transition hover:text-red-500"
@@ -254,63 +210,94 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Brand Story */}
-      <section className="border-y border-white/10 px-6 py-24 md:py-32">
-        <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-[0.9fr_1.1fr] md:items-center">
-          <div>
-            <p className="mb-5 text-xs uppercase tracking-[0.4em] text-white/35">Our Brand</p>
-            <h2 className="text-3xl font-medium leading-tight md:text-5xl">
-              We Don&apos;t Make Content.
-              <br />
-              We Build{' '}
-              <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
-                Unrivaled
-              </span>{' '}
-              Presence.
-            </h2>
-          </div>
+      {/* AI Systems Highlight — split layout */}
+      <section className="px-6 pb-24 md:pb-32">
+        <div className="mx-auto max-w-7xl">
+          <div className="relative overflow-hidden rounded-3xl border border-red-900/40 bg-[linear-gradient(135deg,rgba(120,10,30,0.20)_0%,rgba(0,0,0,0.6)_55%,rgba(140,15,35,0.14)_100%)] p-10 md:p-14">
+            <div className="pointer-events-none absolute -right-32 -top-32 size-72 rounded-full bg-red-700/20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -left-24 size-64 rounded-full bg-red-900/20 blur-3xl" />
 
-          <div>
-            <p className="text-base leading-8 text-white/60 md:text-lg">
-              UNRVLD is a premium media and digital brand that helps businesses, founders,
-              and operators present themselves at a higher level. Through cinematic visuals,
-              modern web design, and AI-powered systems, we create assets that strengthen
-              perception and turn attention into leverage.
-            </p>
-            <Link
-              href="/about"
-              className="mt-7 inline-block text-xs uppercase tracking-[0.25em] text-white/50 transition hover:text-red-500"
-            >
-              Read Our Story →
-            </Link>
+            <div className="relative grid gap-12 md:grid-cols-2 md:items-center">
+              {/* Left: text */}
+              <div>
+                <p className="mb-6 text-xs uppercase tracking-[0.4em] text-red-500">
+                  Now Building // AI Systems
+                </p>
+                <h2 className="text-3xl font-medium leading-tight md:text-4xl lg:text-5xl">
+                  AI Websites &<br />Custom Agents.
+                  <br />
+                  <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+                    Unrivaled
+                  </span>{' '}
+                  execution.
+                </h2>
+                <p className="mt-6 text-sm leading-7 text-white/60 md:text-base">
+                  We build AI-powered websites in days — not weeks — and deploy custom
+                  agents that qualify leads, book calls, and answer prospects on autopilot.
+                  Trained on your brand, your voice, your offer.
+                </p>
+                <Link
+                  href="/contact"
+                  className="mt-8 inline-flex rounded-full bg-red-700 px-7 py-3 text-xs font-medium uppercase tracking-[0.2em] text-white transition hover:bg-red-600"
+                >
+                  Build With AI
+                </Link>
+              </div>
+
+              {/* Right: cards */}
+              <div className="flex flex-col gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
+                <div className="bg-black/80 p-7">
+                  <div className="mb-4 h-px w-8 bg-red-600" />
+                  <h3 className="font-medium">AI-Built Websites</h3>
+                  <p className="mt-3 text-sm leading-7 text-white/55">
+                    Custom premium sites delivered in days. Modern stack, top-tier
+                    performance, fully yours to own.
+                  </p>
+                </div>
+                <div className="bg-black/80 p-7">
+                  <div className="mb-4 h-px w-8 bg-red-600" />
+                  <h3 className="font-medium">Custom AI Agents</h3>
+                  <p className="mt-3 text-sm leading-7 text-white/55">
+                    Brand-trained agents for lead qualification, booking, and
+                    always-on client conversations.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-24 md:py-32">
+      <section className="px-6 pb-24 md:pb-32">
         <div className="mx-auto max-w-7xl rounded-3xl border border-white/10 bg-[linear-gradient(135deg,rgba(140,15,35,0.18),rgba(255,255,255,0.02))] p-10 md:p-16">
-          <p className="mb-6 text-xs uppercase tracking-[0.4em] text-red-500/80">
-            Ready To Build?
-          </p>
-          <h2 className="max-w-3xl text-3xl font-medium leading-tight md:text-6xl">
-            If your brand looks average,
-            <br />
-            it gets treated{' '}
-            <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
-              average.
-            </span>
-          </h2>
-          <p className="mt-7 max-w-xl text-base leading-7 text-white/55">
-            Whether you need content, a site, or a sharper digital presence — UNRVLD
-            builds assets designed to elevate perception and drive serious inquiries.
-          </p>
-          <Link
-            href="/contact"
-            className="mt-10 inline-flex rounded-full bg-white px-8 py-3 text-xs font-medium uppercase tracking-[0.2em] text-black transition hover:opacity-85"
-          >
-            Start Your Project
-          </Link>
+          <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="mb-6 text-xs uppercase tracking-[0.4em] text-red-500/80">
+                Ready To Build?
+              </p>
+              <h2 className="max-w-2xl text-3xl font-medium leading-tight md:text-5xl">
+                If your brand looks average,
+                <br />
+                it gets treated{' '}
+                <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+                  average.
+                </span>
+              </h2>
+              <p className="mt-7 max-w-lg text-base leading-7 text-white/55">
+                Whether you need content, a site, or a sharper digital presence — UNRVLD
+                builds assets designed to elevate perception and drive serious inquiries.
+              </p>
+            </div>
+            <div className="shrink-0">
+              <Link
+                href="/contact"
+                className="inline-flex rounded-full bg-white px-8 py-3 text-xs font-medium uppercase tracking-[0.2em] text-black transition hover:opacity-85"
+              >
+                Start Your Project
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </div>

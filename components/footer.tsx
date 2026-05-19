@@ -15,7 +15,7 @@ export default function Footer() {
           <Link href="/" className="text-base font-semibold tracking-[0.35em] text-white">
             UNRVLD
           </Link>
-          <p className="mt-4 leading-7">Media. Design. Strategy.</p>
+          <p className="mt-4 leading-7">Media. Design. AI.</p>
           <p className="mt-1 text-xs text-white/30">Beverly Hills // CA</p>
         </div>
 
