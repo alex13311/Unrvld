@@ -55,25 +55,29 @@ export default function ContactForm() {
   const onSubmit = async (data: FormValues) => {
     setError(false)
     try {
-      const res = await fetch('https://formsubmit.co/ajax/unrvldllc@gmail.com', {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 15000)
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
+        signal: controller.signal,
         body: JSON.stringify({
+          access_key: 'ed2be87e-27a6-4304-a90d-a3b5cbb0b22f',
           name: data.name,
           email: data.email,
           service: data.service,
           budget: data.budget ?? 'Not provided',
           message: data.message,
-          _subject: `New Inquiry — ${data.name}`,
-          _template: 'table',
-          _captcha: 'false',
+          subject: `New Inquiry — ${data.name}`,
+          from_name: 'UNRVLD Website',
         }),
       })
+      clearTimeout(timeout)
       const json = await res.json().catch(() => ({}))
-      if (res.ok && json.success !== 'false') {
+      if (res.ok && json.success) {
         setSubmitted(true)
       } else {
         console.error('Form submit failed:', res.status, json)
