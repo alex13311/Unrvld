@@ -15,13 +15,16 @@ export default function ContactPage() {
         <div className="mx-auto grid max-w-7xl gap-16 md:grid-cols-[1fr_1.2fr]">
           {/* Left — Info */}
           <div>
-            <p className="mb-6 text-xs uppercase tracking-[0.4em] text-white/35">
+            <p className="mb-6 text-xs uppercase tracking-[0.4em] text-red-500/80">
               Get In Touch
             </p>
             <h1 className="text-4xl font-medium leading-tight md:text-5xl lg:text-6xl">
               Let&apos;s Build
               <br />
-              Something Premium.
+              Something{' '}
+              <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+                Unrivaled.
+              </span>
             </h1>
             <p className="mt-8 max-w-sm text-base leading-7 text-white/55">
               Tell us about your project. We review every inquiry and respond within

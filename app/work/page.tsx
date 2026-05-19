@@ -193,7 +193,7 @@ export default function WorkPage() {
                 key={item.title}
                 className="rounded-2xl border border-white/10 bg-white/[0.02] p-7"
               >
-                <div className="mb-5 h-px w-8 bg-red-800/70" />
+                <div className="mb-5 h-px w-8 bg-red-600" />
                 <h3 className="font-medium">{item.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-white/45">{item.body}</p>
               </div>
@@ -202,9 +202,53 @@ export default function WorkPage() {
         </div>
       </section>
 
+      {/* AI Systems */}
+      <section className="border-t border-white/10 px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-7xl">
+          <p className="mb-2 text-xs uppercase tracking-[0.4em] text-red-500">04</p>
+          <h2 className="mb-4 text-3xl font-medium md:text-5xl">
+            AI Systems{' '}
+            <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+              · New
+            </span>
+          </h2>
+          <p className="max-w-xl text-sm leading-7 text-white/45">
+            AI-powered websites and custom agents that move faster, sell harder, and
+            run 24/7. Built on the same tech the world&apos;s top brands are starting to
+            quietly adopt.
+          </p>
+
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {[
+              {
+                title: 'AI-Built Websites',
+                body: 'Custom premium sites delivered in days. Modern stack, top-tier performance, fully yours to own.',
+              },
+              {
+                title: 'Custom AI Agents',
+                body: 'Brand-trained agents that qualify leads, book calls, and answer prospects on autopilot — in your voice.',
+              },
+              {
+                title: 'Automation & Workflows',
+                body: 'Inbox triage, content pipelines, and operations agents that remove the manual lift from running your business.',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-2xl border border-red-900/30 bg-[linear-gradient(135deg,rgba(120,10,30,0.10),rgba(255,255,255,0.02))] p-7"
+              >
+                <div className="mb-5 h-px w-8 bg-red-600" />
+                <h3 className="font-medium">{item.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-white/55">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="border-t border-white/10 px-6 py-20 text-center">
-        <p className="mb-5 text-xs uppercase tracking-[0.4em] text-white/35">
+        <p className="mb-5 text-xs uppercase tracking-[0.4em] text-red-500/80">
           Ready to Create?
         </p>
         <h2 className="text-3xl font-medium md:text-4xl">Let&apos;s Build Something Premium</h2>
