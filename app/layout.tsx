@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import Nav from '@/components/nav'
 import Footer from '@/components/footer'
+import Script from 'next/script'
 import './globals.css'
 
 const _geist = Geist({ subsets: ['latin'] })
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>{children}</main>
         <Footer />
         <Analytics />
+        <Script src="/widget.js" data-widget-id="unrvld" strategy="afterInteractive" />
       </body>
     </html>
   )
