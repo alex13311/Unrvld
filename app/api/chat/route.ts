@@ -2,118 +2,54 @@ import nodemailer from "nodemailer";
 import { getClient } from "@/lib/clients";
 
 type Msg = { role: "user" | "assistant"; content: string };
-type Lead = { name?: string; phone?: string; email?: string; summary?: string };
-type Block = { type: string; text?: string; name?: string; id?: string; input?: Lead };
-
-interface ClaudeResponse {
-  stop_reason?: string;
-  content?: Block[];
-  error?: { message?: string };
-}
 
 const PHONE_RE = /(\+?\d[\d\s().-]{7,}\d)/;
 const EMAIL_RE = /[^\s@]+@[^\s@]+\.[^\s@]+/;
 
-const SAVE_LEAD_TOOL = {
-  name: "save_lead",
-  description:
-    "Record a sales lead. Call this exactly once, on the turn where the visitor shares a phone " +
-    "number or email address. Include their name and a short summary of what they want, if known.",
-  input_schema: {
-    type: "object",
-    properties: {
-      name: { type: "string", description: "Visitor's name, if provided" },
-      phone: { type: "string", description: "Phone number, if provided" },
-      email: { type: "string", description: "Email address, if provided" },
-      summary: {
-        type: "string",
-        description: "1-2 sentence summary of what they want, their brand, and any timeline",
-      },
-    },
-    required: ["summary"],
-  },
-};
-
-// Deterministic fallback: pull contact info straight from the visitor's messages
-// so a lead is never lost if the model declines to call the tool.
-function extractLead(messages: Msg[]): Lead {
-  const userText = messages
-    .filter((m) => m.role === "user")
-    .map((m) => m.content)
-    .join("\n");
-  const phone = userText.match(PHONE_RE);
-  const email = userText.match(EMAIL_RE);
-  return {
-    phone: phone ? phone[0].trim() : undefined,
-    email: email ? email[0].trim() : undefined,
-    summary: "Lead captured from the website chat.",
-  };
-}
-
-async function sendEmail(lead: Lead, transcript: string) {
+// Email a captured lead using the same Gmail setup the contact form uses.
+async function emailLead(messages: Msg[]) {
   if (!process.env.GMAIL_APP_PASSWORD) {
     console.error("[lead] GMAIL_APP_PASSWORD is not set - cannot email lead");
     return;
   }
+
+  const userText = messages
+    .filter((m) => m.role === "user")
+    .map((m) => m.content)
+    .join("\n");
+  const phoneMatch = userText.match(PHONE_RE);
+  const emailMatch = userText.match(EMAIL_RE);
+  const phone = phoneMatch ? phoneMatch[0].trim() : "";
+  const email = emailMatch ? emailMatch[0].trim() : "";
+
+  const transcript = messages
+    .map((m) => `${m.role === "user" ? "Visitor" : "UNRVLD bot"}: ${m.content}`)
+    .join("\n");
+
+  const body = `New lead from the UNRVLD website chat.
+
+Phone: ${phone || "-"}
+Email: ${email || "-"}
+
+--- Full conversation ---
+${transcript}`.trim();
+
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: { user: "unrvldllc@gmail.com", pass: process.env.GMAIL_APP_PASSWORD },
     });
-    const body = `New chatbot lead from unrvldgroup.com
-
-Name: ${lead.name || "-"}
-Phone: ${lead.phone || "-"}
-Email: ${lead.email || "-"}
-
-Summary: ${lead.summary || "-"}
-
-- Transcript -
-${transcript}`.trim();
     await transporter.sendMail({
       from: "UNRVLD Chatbot <unrvldllc@gmail.com>",
       to: "unrvldllc@gmail.com",
-      replyTo: lead.email || undefined,
-      subject: `New chatbot lead - ${lead.name || lead.phone || lead.email || "unknown"}`,
+      replyTo: email || undefined,
+      subject: `New chat lead - ${phone || email || "website visitor"}`,
       text: body,
     });
     console.log("[lead] email sent");
   } catch (err) {
     console.error("[lead] email failed:", err);
   }
-}
-
-async function sendSMS(lead: Lead) {
-  const sid = process.env.TWILIO_ACCOUNT_SID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
-  const from = process.env.TWILIO_FROM_NUMBER;
-  const to = process.env.LEAD_ALERT_TO;
-  if (!sid || !token || !from || !to) return;
-
-  const lines = ["New UNRVLD lead", lead.name || "Unknown"];
-  if (lead.phone) lines.push(lead.phone);
-  if (lead.email) lines.push(lead.email);
-  if (lead.summary) lines.push(lead.summary);
-
-  try {
-    const params = new URLSearchParams({ From: from, To: to, Body: lines.join("\n") });
-    await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-      method: "POST",
-      headers: {
-        Authorization: "Basic " + Buffer.from(`${sid}:${token}`).toString("base64"),
-        "content-type": "application/x-www-form-urlencoded",
-      },
-      body: params.toString(),
-    });
-    console.log("[lead] sms sent");
-  } catch (err) {
-    console.error("[lead] sms failed:", err);
-  }
-}
-
-async function notify(lead: Lead, transcript: string) {
-  // Best-effort: a failure in one channel must not break the chat reply.
-  await Promise.allSettled([sendEmail(lead, transcript), sendSMS(lead)]);
 }
 
 export async function POST(request: Request) {
@@ -133,88 +69,46 @@ export async function POST(request: Request) {
       });
     }
 
-    const apiMessages: { role: string; content: unknown }[] = messages.map(
-      ({ role, content }) => ({ role, content })
-    );
-
-    // Attach the lead tool only on the turn where the visitor shares contact info.
+    // Fire the lead email the moment the visitor shares a phone or email.
+    // Runs independently of the AI reply so a lead is never lost.
     const lastUser = [...messages].reverse().find((m) => m.role === "user");
     const hasContact =
       !!lastUser && (PHONE_RE.test(lastUser.content) || EMAIL_RE.test(lastUser.content));
+    const leadPromise = hasContact ? emailLead(messages) : Promise.resolve();
 
-    const callClaude = async (): Promise<{
-      ok: boolean;
-      status: number;
-      data: ClaudeResponse;
-    }> => {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "x-api-key": process.env.ANTHROPIC_API_KEY!,
-          "anthropic-version": "2023-06-01",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-5",
-          max_tokens: 1000,
-          system: client.systemPrompt,
-          messages: apiMessages,
-          ...(hasContact ? { tools: [SAVE_LEAD_TOOL] } : {}),
-        }),
-      });
-      const data = (await res.json()) as ClaudeResponse;
-      return { ok: res.ok, status: res.status, data };
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5",
+        max_tokens: 1000,
+        system: client.systemPrompt,
+        messages: messages.map(({ role, content }) => ({ role, content })),
+      }),
+    });
+
+    const data = (await response.json()) as {
+      content?: { type: string; text?: string }[];
+      error?: { message?: string };
     };
 
-    let { ok, status, data } = await callClaude();
-    if (!ok) {
+    // Make sure the email finishes before the serverless function returns.
+    await leadPromise;
+
+    if (!response.ok) {
       return Response.json({
-        text: `API error: ${data?.error?.message || `API error (${status})`}`,
+        text: `API error: ${data?.error?.message || `API error (${response.status})`}`,
       });
-    }
-
-    let leadFromTool: Lead | null = null;
-    if (data.stop_reason === "tool_use") {
-      const toolUse = (data.content || []).find(
-        (b) => b.type === "tool_use" && b.name === "save_lead"
-      );
-      if (toolUse) {
-        leadFromTool = toolUse.input || null;
-        apiMessages.push({ role: "assistant", content: data.content });
-        apiMessages.push({
-          role: "user",
-          content: [
-            {
-              type: "tool_result",
-              tool_use_id: toolUse.id,
-              content:
-                "Lead saved. Thank the visitor warmly and confirm Alex will reach out within 24-48 hours.",
-            },
-          ],
-        });
-
-        ({ ok, status, data } = await callClaude());
-        if (!ok) {
-          return Response.json({
-            text: `API error: ${data?.error?.message || `API error (${status})`}`,
-          });
-        }
-      }
     }
 
     const text = (data.content || [])
       .filter((b) => b.type === "text")
       .map((b) => b.text)
       .join("");
-
-    // Fire the lead notification whenever the visitor shared contact info,
-    // using the model's structured data if available, otherwise a regex fallback.
-    if (hasContact) {
-      const transcript = messages
-        .map((m) => `${m.role === "user" ? "Visitor" : "Bot"}: ${m.content}`)
-        .join("\n");
-      await notify(leadFromTool || extractLead(messages), transcript);
-    }
 
     return Response.json({ text: text || "API returned an empty response." });
   } catch {
