@@ -9,10 +9,16 @@ export async function POST(request: Request) {
       return Response.json({ text: "Widget not found." }, { status: 404 });
     }
 
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return Response.json({
+        text: "Config error: ANTHROPIC_API_KEY is not set on the server.",
+      });
+    }
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        "x-api-key": process.env.ANTHROPIC_API_KEY!,
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
         "content-type": "application/json",
       },
@@ -25,12 +31,18 @@ export async function POST(request: Request) {
     });
 
     const data = await response.json();
+
+    if (!response.ok) {
+      const detail = data?.error?.message || `API error (${response.status})`;
+      return Response.json({ text: `API error: ${detail}` });
+    }
+
     const text = ((data.content as { type: string; text: string }[]) || [])
       .filter((b) => b.type === "text")
       .map((b) => b.text)
       .join("");
 
-    return Response.json({ text });
+    return Response.json({ text: text || "API returned an empty response." });
   } catch {
     return Response.json({
       text: "Something went wrong — please reach out directly.",
