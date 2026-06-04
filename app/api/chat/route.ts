@@ -8,7 +8,8 @@ const EMAIL_RE = /[^\s@]+@[^\s@]+\.[^\s@]+/;
 
 // Email a captured lead using the same Gmail setup the contact form uses.
 async function emailLead(messages: Msg[]) {
-  if (!process.env.GMAIL_APP_PASSWORD) {
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  if (!pass) {
     console.error("[lead] GMAIL_APP_PASSWORD is not set - cannot email lead");
     return;
   }
@@ -37,7 +38,7 @@ ${transcript}`.trim();
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
-      auth: { user: "unrvldllc@gmail.com", pass: process.env.GMAIL_APP_PASSWORD },
+      auth: { user: "unrvldllc@gmail.com", pass: pass },
     });
     await transporter.sendMail({
       from: "UNRVLD Chatbot <unrvldllc@gmail.com>",
@@ -63,7 +64,9 @@ export async function POST(request: Request) {
     if (!client) {
       return Response.json({ text: "Widget not found." }, { status: 404 });
     }
-    if (!process.env.ANTHROPIC_API_KEY) {
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
       return Response.json({
         text: "Config error: ANTHROPIC_API_KEY is not set on the server.",
       });
@@ -79,7 +82,7 @@ export async function POST(request: Request) {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",
         "content-type": "application/json",
       },
