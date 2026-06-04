@@ -23,7 +23,7 @@ export async function POST(request: Request) {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5",
         max_tokens: 1000,
         system: client.systemPrompt,
         messages: messages.map(({ role, content }: { role: string; content: string }) => ({ role, content })),
