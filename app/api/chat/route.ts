@@ -34,13 +34,33 @@ const SAVE_LEAD_TOOL = {
   },
 };
 
+// Deterministic fallback: pull contact info straight from the visitor's messages
+// so a lead is never lost if the model declines to call the tool.
+function extractLead(messages: Msg[]): Lead {
+  const userText = messages
+    .filter((m) => m.role === "user")
+    .map((m) => m.content)
+    .join("\n");
+  const phone = userText.match(PHONE_RE);
+  const email = userText.match(EMAIL_RE);
+  return {
+    phone: phone ? phone[0].trim() : undefined,
+    email: email ? email[0].trim() : undefined,
+    summary: "Lead captured from the website chat.",
+  };
+}
+
 async function sendEmail(lead: Lead, transcript: string) {
-  if (!process.env.GMAIL_APP_PASSWORD) return;
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: "unrvldllc@gmail.com", pass: process.env.GMAIL_APP_PASSWORD },
-  });
-  const body = `New chatbot lead from unrvldgroup.com
+  if (!process.env.GMAIL_APP_PASSWORD) {
+    console.error("[lead] GMAIL_APP_PASSWORD is not set - cannot email lead");
+    return;
+  }
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: "unrvldllc@gmail.com", pass: process.env.GMAIL_APP_PASSWORD },
+    });
+    const body = `New chatbot lead from unrvldgroup.com
 
 Name: ${lead.name || "-"}
 Phone: ${lead.phone || "-"}
@@ -50,13 +70,17 @@ Summary: ${lead.summary || "-"}
 
 - Transcript -
 ${transcript}`.trim();
-  await transporter.sendMail({
-    from: "UNRVLD Chatbot <unrvldllc@gmail.com>",
-    to: "unrvldllc@gmail.com",
-    replyTo: lead.email || undefined,
-    subject: `New chatbot lead - ${lead.name || lead.phone || lead.email || "unknown"}`,
-    text: body,
-  });
+    await transporter.sendMail({
+      from: "UNRVLD Chatbot <unrvldllc@gmail.com>",
+      to: "unrvldllc@gmail.com",
+      replyTo: lead.email || undefined,
+      subject: `New chatbot lead - ${lead.name || lead.phone || lead.email || "unknown"}`,
+      text: body,
+    });
+    console.log("[lead] email sent");
+  } catch (err) {
+    console.error("[lead] email failed:", err);
+  }
 }
 
 async function sendSMS(lead: Lead) {
@@ -71,15 +95,20 @@ async function sendSMS(lead: Lead) {
   if (lead.email) lines.push(lead.email);
   if (lead.summary) lines.push(lead.summary);
 
-  const params = new URLSearchParams({ From: from, To: to, Body: lines.join("\n") });
-  await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-    method: "POST",
-    headers: {
-      Authorization: "Basic " + Buffer.from(`${sid}:${token}`).toString("base64"),
-      "content-type": "application/x-www-form-urlencoded",
-    },
-    body: params.toString(),
-  });
+  try {
+    const params = new URLSearchParams({ From: from, To: to, Body: lines.join("\n") });
+    await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+      method: "POST",
+      headers: {
+        Authorization: "Basic " + Buffer.from(`${sid}:${token}`).toString("base64"),
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
+    });
+    console.log("[lead] sms sent");
+  } catch (err) {
+    console.error("[lead] sms failed:", err);
+  }
 }
 
 async function notify(lead: Lead, transcript: string) {
@@ -108,8 +137,7 @@ export async function POST(request: Request) {
       ({ role, content }) => ({ role, content })
     );
 
-    // Only attach the lead tool on the turn where the visitor shares contact info.
-    // This keeps normal turns fast and makes the lead fire exactly once.
+    // Attach the lead tool only on the turn where the visitor shares contact info.
     const lastUser = [...messages].reverse().find((m) => m.role === "user");
     const hasContact =
       !!lastUser && (PHONE_RE.test(lastUser.content) || EMAIL_RE.test(lastUser.content));
@@ -145,16 +173,13 @@ export async function POST(request: Request) {
       });
     }
 
+    let leadFromTool: Lead | null = null;
     if (data.stop_reason === "tool_use") {
       const toolUse = (data.content || []).find(
         (b) => b.type === "tool_use" && b.name === "save_lead"
       );
       if (toolUse) {
-        const transcript = messages
-          .map((m) => `${m.role === "user" ? "Visitor" : "Bot"}: ${m.content}`)
-          .join("\n");
-        await notify(toolUse.input || {}, transcript);
-
+        leadFromTool = toolUse.input || null;
         apiMessages.push({ role: "assistant", content: data.content });
         apiMessages.push({
           role: "user",
@@ -181,6 +206,15 @@ export async function POST(request: Request) {
       .filter((b) => b.type === "text")
       .map((b) => b.text)
       .join("");
+
+    // Fire the lead notification whenever the visitor shared contact info,
+    // using the model's structured data if available, otherwise a regex fallback.
+    if (hasContact) {
+      const transcript = messages
+        .map((m) => `${m.role === "user" ? "Visitor" : "Bot"}: ${m.content}`)
+        .join("\n");
+      await notify(leadFromTool || extractLead(messages), transcript);
+    }
 
     return Response.json({ text: text || "API returned an empty response." });
   } catch {
