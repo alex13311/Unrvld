@@ -1,4 +1,3 @@
-import nodemailer from "nodemailer";
 import { getClient } from "@/lib/clients";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -6,14 +5,9 @@ type Msg = { role: "user" | "assistant"; content: string };
 const PHONE_RE = /(\+?\d[\d\s().-]{7,}\d)/;
 const EMAIL_RE = /[^\s@]+@[^\s@]+\.[^\s@]+/;
 
-// Email a captured lead using the same Gmail setup the contact form uses.
-async function emailLead(messages: Msg[]) {
-  const pass = process.env.GMAIL_APP_PASSWORD;
-  if (!pass) {
-    console.error("[lead] GMAIL_APP_PASSWORD is not set - cannot email lead");
-    return;
-  }
-
+// Forward a captured lead to the same /api/contact endpoint the contact form
+// uses, so it lands in the inbox exactly like a normal inquiry.
+async function sendLead(origin: string, messages: Msg[]) {
   const userText = messages
     .filter((m) => m.role === "user")
     .map((m) => m.content)
@@ -27,29 +21,27 @@ async function emailLead(messages: Msg[]) {
     .map((m) => `${m.role === "user" ? "Visitor" : "UNRVLD bot"}: ${m.content}`)
     .join("\n");
 
-  const body = `New lead from the UNRVLD website chat.
-
-Phone: ${phone || "-"}
-Email: ${email || "-"}
-
---- Full conversation ---
-${transcript}`.trim();
+  const message =
+    `Lead captured from the website chat.\n\n` +
+    `Phone: ${phone || "-"}\n` +
+    `Email: ${email || "-"}\n\n` +
+    `--- Conversation ---\n${transcript}`;
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: "unrvldllc@gmail.com", pass: pass },
+    const res = await fetch(origin + "/api/contact", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: phone ? `Chat lead (${phone})` : "Website chat lead",
+        email: email || "unrvldllc@gmail.com",
+        service: "AI chat lead",
+        budget: "",
+        message,
+      }),
     });
-    await transporter.sendMail({
-      from: "UNRVLD Chatbot <unrvldllc@gmail.com>",
-      to: "unrvldllc@gmail.com",
-      replyTo: email || undefined,
-      subject: `New chat lead - ${phone || email || "website visitor"}`,
-      text: body,
-    });
-    console.log("[lead] email sent");
+    console.log("[lead] forwarded to /api/contact, status:", res.status);
   } catch (err) {
-    console.error("[lead] email failed:", err);
+    console.error("[lead] forward failed:", err);
   }
 }
 
@@ -72,12 +64,13 @@ export async function POST(request: Request) {
       });
     }
 
-    // Fire the lead email the moment the visitor shares a phone or email.
-    // Runs independently of the AI reply so a lead is never lost.
+    // Fire the lead the moment the visitor shares a phone or email,
+    // independently of the AI reply so a lead is never lost.
+    const origin = new URL(request.url).origin;
     const lastUser = [...messages].reverse().find((m) => m.role === "user");
     const hasContact =
       !!lastUser && (PHONE_RE.test(lastUser.content) || EMAIL_RE.test(lastUser.content));
-    const leadPromise = hasContact ? emailLead(messages) : Promise.resolve();
+    const leadPromise = hasContact ? sendLead(origin, messages) : Promise.resolve();
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -99,7 +92,7 @@ export async function POST(request: Request) {
       error?: { message?: string };
     };
 
-    // Make sure the email finishes before the serverless function returns.
+    // Make sure the lead finishes sending before the function returns.
     await leadPromise;
 
     if (!response.ok) {
