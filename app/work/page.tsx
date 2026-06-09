@@ -193,7 +193,7 @@ export default function WorkPage() {
                 key={item.title}
                 className="rounded-2xl border border-white/10 bg-white/[0.02] p-7"
               >
-                <div className="mb-5 h-px w-8 bg-red-600" />
+                <div className="mb-5 h-px w-8 bg-green-600" />
                 <h3 className="font-medium">{item.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-white/45">{item.body}</p>
               </div>
@@ -205,10 +205,10 @@ export default function WorkPage() {
       {/* AI Systems */}
       <section className="border-t border-white/10 px-6 py-20 md:py-28">
         <div className="mx-auto max-w-7xl">
-          <p className="mb-2 text-xs uppercase tracking-[0.4em] text-red-500">04</p>
+          <p className="mb-2 text-xs uppercase tracking-[0.4em] text-green-500">04</p>
           <h2 className="mb-4 text-3xl font-medium md:text-5xl">
             AI Systems{' '}
-            <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-br from-green-500 to-green-900 bg-clip-text text-transparent">
               · New
             </span>
           </h2>
@@ -235,9 +235,9 @@ export default function WorkPage() {
             ].map((item) => (
               <div
                 key={item.title}
-                className="rounded-2xl border border-red-900/30 bg-[linear-gradient(135deg,rgba(120,10,30,0.10),rgba(255,255,255,0.02))] p-7"
+                className="rounded-2xl border border-green-900/30 bg-[linear-gradient(135deg,rgba(10,120,30,0.10),rgba(255,255,255,0.02))] p-7"
               >
-                <div className="mb-5 h-px w-8 bg-red-600" />
+                <div className="mb-5 h-px w-8 bg-green-600" />
                 <h3 className="font-medium">{item.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-white/55">{item.body}</p>
               </div>
@@ -248,7 +248,7 @@ export default function WorkPage() {
 
       {/* CTA */}
       <section className="border-t border-white/10 px-6 py-20 text-center">
-        <p className="mb-5 text-xs uppercase tracking-[0.4em] text-red-500/80">
+        <p className="mb-5 text-xs uppercase tracking-[0.4em] text-green-500/80">
           Ready to Create?
         </p>
         <h2 className="text-3xl font-medium md:text-4xl">Let&apos;s Build Something Premium</h2>

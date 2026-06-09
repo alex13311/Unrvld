@@ -43,7 +43,7 @@ export default function Nav() {
             >
               {link.label}
               <span
-                className={`pointer-events-none absolute -bottom-0.5 left-0 h-px bg-gradient-to-r from-red-500 to-red-800 transition-all duration-300 ${
+                className={`pointer-events-none absolute -bottom-0.5 left-0 h-px bg-gradient-to-r from-green-500 to-green-800 transition-all duration-300 ${
                   isActive(link.href) ? 'w-full' : 'w-0'
                 }`}
               />
@@ -54,7 +54,7 @@ export default function Nav() {
         <div className="flex items-center gap-4">
           <Link
             href="/contact"
-            className="hidden rounded-full border border-white/25 px-5 py-2 text-xs uppercase tracking-[0.2em] text-white transition hover:border-red-600 hover:bg-red-700 hover:text-white sm:inline-flex"
+            className="hidden rounded-full border border-white/25 px-5 py-2 text-xs uppercase tracking-[0.2em] text-white transition hover:border-green-600 hover:bg-green-700 hover:text-white sm:inline-flex"
           >
             Book a Call
           </Link>
@@ -89,7 +89,7 @@ export default function Nav() {
                     }`}
                   >
                     {isActive(link.href) && (
-                      <span className="h-px w-5 bg-gradient-to-r from-red-500 to-red-800" />
+                      <span className="h-px w-5 bg-gradient-to-r from-green-500 to-green-800" />
                     )}
                     {link.label}
                   </Link>
@@ -100,7 +100,7 @@ export default function Nav() {
                 <Link
                   href="/contact"
                   onClick={() => setOpen(false)}
-                  className="inline-flex rounded-full border border-white/25 px-5 py-3 text-xs uppercase tracking-[0.2em] text-white transition hover:border-red-600 hover:bg-red-700 hover:text-white"
+                  className="inline-flex rounded-full border border-white/25 px-5 py-3 text-xs uppercase tracking-[0.2em] text-white transition hover:border-green-600 hover:bg-green-700 hover:text-white"
                 >
                   Book a Call
                 </Link>

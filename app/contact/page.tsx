@@ -15,14 +15,14 @@ export default function ContactPage() {
         <div className="mx-auto grid max-w-7xl gap-16 md:grid-cols-[1fr_1.2fr]">
           {/* Left — Info */}
           <div>
-            <p className="mb-6 text-xs uppercase tracking-[0.4em] text-red-500/80">
+            <p className="mb-6 text-xs uppercase tracking-[0.4em] text-green-500/80">
               Get In Touch
             </p>
             <h1 className="text-4xl font-medium leading-tight md:text-5xl lg:text-6xl">
               Let&apos;s Build
               <br />
               Something{' '}
-              <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-br from-green-500 to-green-900 bg-clip-text text-transparent">
                 Unrivaled.
               </span>
             </h1>

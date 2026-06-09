@@ -61,13 +61,13 @@ export default function HomePage() {
         <div className="relative w-full px-6 pb-16 pt-40">
           <div className="mx-auto max-w-7xl">
             <p className="mb-8 text-xs uppercase tracking-[0.4em] text-white/50">
-              <span className="text-red-500/80">Beverly Hills</span> // Digital
+              <span className="text-green-500/80">Beverly Hills</span> // Digital
             </p>
             <h1 className="max-w-4xl text-5xl font-medium leading-[0.9] tracking-tight md:text-7xl lg:text-[6rem]">
               Where Presence
               <br />
               Becomes{' '}
-              <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-br from-green-500 to-green-900 bg-clip-text text-transparent">
                 Power.
               </span>
             </h1>
@@ -84,7 +84,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/contact"
-                className="rounded-full border border-white/30 px-7 py-3 text-xs uppercase tracking-[0.2em] text-white transition hover:border-red-600 hover:bg-red-700 hover:text-white"
+                className="rounded-full border border-white/30 px-7 py-3 text-xs uppercase tracking-[0.2em] text-white transition hover:border-green-600 hover:bg-green-700 hover:text-white"
               >
                 Start Project
               </Link>
@@ -108,11 +108,11 @@ export default function HomePage() {
           {capabilities.map((cap, i) => (
             <span key={cap.label} className="flex items-center gap-10">
               <span className="flex items-baseline gap-2">
-                <span className="text-[9px] tabular-nums text-red-500/60">{cap.number}</span>
+                <span className="text-[9px] tabular-nums text-green-500/60">{cap.number}</span>
                 <span className="text-[11px] uppercase tracking-[0.3em] text-white/35">{cap.label}</span>
               </span>
               {i < capabilities.length - 1 && (
-                <span className="text-red-700/30">·</span>
+                <span className="text-green-700/30">·</span>
               )}
             </span>
           ))}
@@ -130,13 +130,13 @@ export default function HomePage() {
           <div className="grid gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] sm:grid-cols-2 lg:grid-cols-4">
             {services.map((s) => (
               <div key={s.number} className="bg-black p-8 md:p-10">
-                <div className="mb-6 h-px w-8 bg-red-600" />
+                <div className="mb-6 h-px w-8 bg-green-600" />
                 <p className="text-xs tabular-nums text-white/20">{s.number}</p>
                 <h3 className="mt-5 text-xl font-medium md:text-2xl">{s.title}</h3>
                 <p className="mt-5 text-sm leading-7 text-white/55">{s.body}</p>
                 <Link
                   href={s.href}
-                  className="mt-8 inline-block text-xs uppercase tracking-[0.25em] text-white/70 underline-offset-4 transition hover:text-red-500 hover:underline"
+                  className="mt-8 inline-block text-xs uppercase tracking-[0.25em] text-white/70 underline-offset-4 transition hover:text-green-500 hover:underline"
                 >
                   {s.cta}
                 </Link>
@@ -156,14 +156,14 @@ export default function HomePage() {
               </p>
               <h2 className="text-3xl font-medium md:text-5xl">
                 Built To Look{' '}
-                <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-br from-green-500 to-green-900 bg-clip-text text-transparent">
                   Untouchable
                 </span>
               </h2>
             </div>
             <Link
               href="/work"
-              className="hidden shrink-0 text-xs uppercase tracking-[0.25em] text-white/45 transition hover:text-red-500 md:block"
+              className="hidden shrink-0 text-xs uppercase tracking-[0.25em] text-white/45 transition hover:text-green-500 md:block"
             >
               View All →
             </Link>
@@ -174,7 +174,7 @@ export default function HomePage() {
               <Link
                 key={i}
                 href={item.href}
-                className={`group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-red-900/50 ${item.wide ? 'md:col-span-2' : ''}`}
+                className={`group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-green-900/50 ${item.wide ? 'md:col-span-2' : ''}`}
               >
                 {item.video ? (
                   <div className={`relative overflow-hidden ${item.wide ? 'aspect-[16/10]' : 'aspect-[4/3]'}`}>
@@ -185,7 +185,7 @@ export default function HomePage() {
                     <Image src={item.image.src} alt={item.title} fill className="object-cover transition duration-500 group-hover:scale-[1.02] group-hover:opacity-90" />
                   </div>
                 ) : (
-                  <div className={`${item.wide ? 'aspect-[16/10]' : 'aspect-[4/3]'} bg-[linear-gradient(135deg,rgba(90,0,0,0.3),rgba(255,255,255,0.02),rgba(0,0,0,0.7))]`} />
+                  <div className={`${item.wide ? 'aspect-[16/10]' : 'aspect-[4/3]'} bg-[linear-gradient(135deg,rgba(0,90,0,0.3),rgba(255,255,255,0.02),rgba(0,0,0,0.7))]`} />
                 )}
                 <div className="p-5">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-white/30">
@@ -202,7 +202,7 @@ export default function HomePage() {
           <div className="mt-6 text-center md:hidden">
             <Link
               href="/work"
-              className="text-xs uppercase tracking-[0.25em] text-white/45 transition hover:text-red-500"
+              className="text-xs uppercase tracking-[0.25em] text-white/45 transition hover:text-green-500"
             >
               View All Work →
             </Link>
@@ -213,20 +213,20 @@ export default function HomePage() {
       {/* AI Systems Highlight — split layout */}
       <section className="px-6 pb-24 md:pb-32">
         <div className="mx-auto max-w-7xl">
-          <div className="relative overflow-hidden rounded-3xl border border-red-900/40 bg-[linear-gradient(135deg,rgba(120,10,30,0.20)_0%,rgba(0,0,0,0.6)_55%,rgba(140,15,35,0.14)_100%)] p-10 md:p-14">
-            <div className="pointer-events-none absolute -right-32 -top-32 size-72 rounded-full bg-red-700/20 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 -left-24 size-64 rounded-full bg-red-900/20 blur-3xl" />
+          <div className="relative overflow-hidden rounded-3xl border border-green-900/40 bg-[linear-gradient(135deg,rgba(10,120,30,0.20)_0%,rgba(0,0,0,0.6)_55%,rgba(15,140,35,0.14)_100%)] p-10 md:p-14">
+            <div className="pointer-events-none absolute -right-32 -top-32 size-72 rounded-full bg-green-700/20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -left-24 size-64 rounded-full bg-green-900/20 blur-3xl" />
 
             <div className="relative grid gap-12 md:grid-cols-2 md:items-center">
               {/* Left: text */}
               <div>
-                <p className="mb-6 text-xs uppercase tracking-[0.4em] text-red-500">
+                <p className="mb-6 text-xs uppercase tracking-[0.4em] text-green-500">
                   Now Building // AI Systems
                 </p>
                 <h2 className="text-3xl font-medium leading-tight md:text-4xl lg:text-5xl">
                   AI Websites &<br />Custom Agents.
                   <br />
-                  <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-br from-green-500 to-green-900 bg-clip-text text-transparent">
                     Unrivaled
                   </span>{' '}
                   execution.
@@ -238,7 +238,7 @@ export default function HomePage() {
                 </p>
                 <Link
                   href="/contact"
-                  className="mt-8 inline-flex rounded-full bg-red-700 px-7 py-3 text-xs font-medium uppercase tracking-[0.2em] text-white transition hover:bg-red-600"
+                  className="mt-8 inline-flex rounded-full bg-green-700 px-7 py-3 text-xs font-medium uppercase tracking-[0.2em] text-white transition hover:bg-green-600"
                 >
                   Build With AI
                 </Link>
@@ -247,7 +247,7 @@ export default function HomePage() {
               {/* Right: cards */}
               <div className="flex flex-col gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
                 <div className="bg-black/80 p-7">
-                  <div className="mb-4 h-px w-8 bg-red-600" />
+                  <div className="mb-4 h-px w-8 bg-green-600" />
                   <h3 className="font-medium">AI-Built Websites</h3>
                   <p className="mt-3 text-sm leading-7 text-white/55">
                     Custom premium sites delivered in days. Modern stack, top-tier
@@ -255,7 +255,7 @@ export default function HomePage() {
                   </p>
                 </div>
                 <div className="bg-black/80 p-7">
-                  <div className="mb-4 h-px w-8 bg-red-600" />
+                  <div className="mb-4 h-px w-8 bg-green-600" />
                   <h3 className="font-medium">Custom AI Agents</h3>
                   <p className="mt-3 text-sm leading-7 text-white/55">
                     Brand-trained agents for lead qualification, booking, and
@@ -270,17 +270,17 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="px-6 pb-24 md:pb-32">
-        <div className="mx-auto max-w-7xl rounded-3xl border border-white/10 bg-[linear-gradient(135deg,rgba(140,15,35,0.18),rgba(255,255,255,0.02))] p-10 md:p-16">
+        <div className="mx-auto max-w-7xl rounded-3xl border border-white/10 bg-[linear-gradient(135deg,rgba(15,140,35,0.18),rgba(255,255,255,0.02))] p-10 md:p-16">
           <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="mb-6 text-xs uppercase tracking-[0.4em] text-red-500/80">
+              <p className="mb-6 text-xs uppercase tracking-[0.4em] text-green-500/80">
                 Ready To Build?
               </p>
               <h2 className="max-w-2xl text-3xl font-medium leading-tight md:text-5xl">
                 If your brand looks average,
                 <br />
                 it gets treated{' '}
-                <span className="bg-gradient-to-br from-red-500 to-red-900 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-br from-green-500 to-green-900 bg-clip-text text-transparent">
                   average.
                 </span>
               </h2>
